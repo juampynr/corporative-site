@@ -1,0 +1,12 @@
+/* Css styles for featured_news */
+div.view-display-id-attachment_1 ul {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+}
+div.view-display-id-attachment_1 li {
+  display: inline-block;
+  width: 200px;
+  margin-right: 0px;
+  padding: 0px;
+}

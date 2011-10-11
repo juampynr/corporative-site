@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Homepage Slideshow feature.
+ */
+
+include_once('feature_homepage_slideshow.features.inc');

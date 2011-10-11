@@ -1,0 +1,28 @@
+<?php
+/**
+ * @file
+ * Code for the Featured News feature.
+ */
+
+include_once('featured_news.features.inc');
+
+/**
+ * Implements hook_views_query_alter()
+ *
+ * Removes nids of nodes being listed in the featured news attachment
+ */
+function featured_news_views_query_alter(&$view, &$query) {
+  if ($view->name == 'news' && $view->current_display == 'page') {
+    $results = views_get_view_result('news', 'attachment_1');
+    $nids = array();
+    foreach ($results as $result) {
+      $nids[] = $result->nid;
+    }
+    $query->where[0]['conditions'][] = array(
+      'field' => 'node.nid',
+      'value' => $nids,
+      'operator' => 'NOT IN',
+    );
+    drupal_add_css(drupal_get_path('module', 'featured_news') . '/featured_news.css');
+  }
+}

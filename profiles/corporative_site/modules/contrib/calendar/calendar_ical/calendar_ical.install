@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the calendar_ical module.
+ *
+ */
+
+function calendar_ical_update_last_removed() {
+  return 6000;
+}

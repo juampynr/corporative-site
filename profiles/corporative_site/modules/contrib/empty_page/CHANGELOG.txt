@@ -1,0 +1,10 @@
+CHANGELOG for Empty Page for Drupal 7
+Empty Page 7.x-1.0
+  Tasks:
+    - converted from 6.x HEAD
+    - changed instances of time() to REQUEST_TIME
+    - added description to admin/structure/empty-page menu item
+    - removed t() treatment from menu item titles and descriptions
+    - updated code formatting as per D7 recommendation
+    - updated block comments as per D7 recommendation
+    - fixed D6 specific references in README

@@ -1,0 +1,10 @@
+Featured News installation instructions
+======================================
+
+Just activate the module and create a few "new" items at node/add/new.
+
+If you mark the option "Promoted to front page" (located within the "Publishing options" tab) 
+it will be listed in the "Featured news" header at /news. If not, it will appear in the paged
+listing.
+
+News listed as Featured are not listed in the paged listing.

@@ -1,0 +1,215 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Module Site_map\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-09-30 21:53+0100\n"
+"Last-Translator: \n"
+"Language-Team: NetInformatica <info@netinformatica.es>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: Spanish\n"
+"X-Poedit-Country: SPAIN\n"
+
+#: site_map.module:34
+msgid "Site map message"
+msgstr "Mensaje del Mapa"
+
+#: site_map.module:38
+msgid "Define a message to be displayed above the site map."
+msgstr "Define el mensaje a mostrar encima del mapa del sitio."
+
+#: site_map.module:43
+msgid "Site map content"
+msgstr "Contenido del Mapa del Sitio"
+
+#: site_map.module:47
+msgid "Show front page"
+msgstr "Mostrar página de inicio"
+
+#: site_map.module:50
+msgid "When enabled, this option will include the front page in the site map."
+msgstr "Cuando está habilitada, esta opción incluye la página inicial en el mapa del sitio."
+
+#: site_map.module:54
+msgid "Show recent blog authors"
+msgstr "Mostrar los autores de blog recientes"
+
+#: site_map.module:57
+msgid "When enabled, this option will show the recent blog authors."
+msgstr "Cuando está habilitada, esta opción muestra los autores de blog recientes."
+
+#: site_map.module:69
+msgid "Books to include in the site map"
+msgstr "Libros a incluir en el mapa del sitio"
+
+#: site_map.module:73;84;99
+msgid "Ctrl-click (Windows) or Command-click (Mac) to select more than one value."
+msgstr "Ctrl-click (Windows) o Command-click (Mac) para seleccionar más de un valor."
+
+#: site_map.module:80
+msgid "Menus to include in the site map"
+msgstr "Menús a incluir en el mapa del sitio"
+
+#: site_map.module:95
+msgid "Categories to include in the site map"
+msgstr "Categorías a incluir en el mapa del sitio"
+
+#: site_map.module:104
+msgid "Categories settings"
+msgstr "Configuración de categorias"
+
+#: site_map.module:108
+msgid "Show books expanded"
+msgstr "Mostrar los libros expandidos"
+
+#: site_map.module:111
+msgid "When enabled, this option will show all children pages for each book."
+msgstr "Cuando está habilitada, esta opción muestra las páginas hijo de cada libro."
+
+#: site_map.module:115
+msgid "Show node counts by categories"
+msgstr "Mostrar el número de nodos por categorías"
+
+#: site_map.module:118
+msgid "When enabled, this option will show the number of nodes in each taxonomy term."
+msgstr "Cuando está habilitada, esta opción muestra el número de nodo en cada término de la taxonomía."
+
+#: site_map.module:122
+msgid "Categories depth"
+msgstr "Profundidad de las categorías"
+
+#: site_map.module:126
+msgid "Specify how many subcategories should be included on the categorie page. Enter \"all\" to include all subcategories,\"0\" to include no subcategories, or \"-1\" not to append the depth at all."
+msgstr "Especifica cuantas subcategorías se deben incluir en la página de la categoría. Introduce \"all\" para incluir todas las subcategorías, \"0\" para no incluir subcategorías, o \"-1\" para no incluir la profundidad en absoluto."
+
+#: site_map.module:131
+msgid "RSS settings"
+msgstr "Configuración de RSS"
+
+#: site_map.module:135
+msgid "Include RSS links"
+msgstr "Incluir enlaces RSS"
+
+#: site_map.module:138
+msgid "When enabled, this option will show links to the RSS feeds for each category and blog."
+msgstr "Cuando está habilitada, esta opción muestra los enlaces a los orígenes RSS para cada categoría y blog."
+
+#: site_map.module:142
+msgid "RSS feed depth"
+msgstr "Profundidad del origen RSS"
+
+#: site_map.module:146
+msgid "Specify how many subcategories should be included in the RSS feed. Enter \"all\" to include all subcategories or \"0\" to include no subcategories."
+msgstr "Especifica cuantas subcategorías deberían ser incluídas en el origen RSS.  Introduce \"all\" para incluir todas las subcategorías, \"0\" para no incluir subcategorías."
+
+#: site_map.module:161;170
+#: site_map.info:0
+msgid "Site map"
+msgstr "Mapa del Sitio"
+
+#: site_map.module:162
+msgid "Control what should be displayed on the site map."
+msgstr "Controla lo que se debe mostrar en el mapa del sitio."
+
+#: site_map.module:185
+msgid "Syndicate (site map)"
+msgstr "Agregar (mapa del sitio)"
+
+#: site_map.module:190
+msgid "Syndicate"
+msgstr "Agregar"
+
+#: site_map.module:199
+msgid "more"
+msgstr "más"
+
+#: site_map.module:199
+msgid "View the site map to see more RSS feeds."
+msgstr "Ver en el mapa del sitio más orígenes RSS."
+
+#: site_map.module:223;258;273;279;291;301;437
+msgid "RSS"
+msgstr "RSS"
+
+#: site_map.module:223
+msgid "This is a link to a content RSS feed"
+msgstr "Este es un enlace a contenido de origen RSS"
+
+#: site_map.module:225;258
+msgid "C-RSS"
+msgstr "C-RSS"
+
+#: site_map.module:225
+msgid "This is a link to a comment RSS feed"
+msgstr "Este es un enlace a un comentario de origen RSS"
+
+#: site_map.module:257
+msgid "Front page"
+msgstr "Página Inicial"
+
+#: site_map.module:258
+msgid "Front page of %sn"
+msgstr "Página Inicial de %sn"
+
+#: site_map.module:258;273;279;291;301;437
+msgid "Syndicate content"
+msgstr "Agregar contenido"
+
+#: site_map.module:258
+msgid "Syndicate comments"
+msgstr "Agregar comentarios"
+
+#: site_map.module:269
+msgid "Blogs"
+msgstr "Blogs"
+
+#: site_map.module:270
+msgid "Community blog and recent blog authors at %sn."
+msgstr "Blog de la comunidad y autores de blog recientes en %sn."
+
+#: site_map.module:273
+msgid "All blogs"
+msgstr "Todos los blogs"
+
+#: site_map.module:279
+msgid "!s's blog"
+msgstr "El blog de !s"
+
+#: site_map.module:290
+msgid "Audio"
+msgstr "Sonido"
+
+#: site_map.module:291
+msgid "Audio content"
+msgstr "Contenido de sonido"
+
+#: site_map.module:300
+msgid "Video"
+msgstr "Vídeo"
+
+#: site_map.module:301
+msgid "Video content"
+msgstr "Contenido de vídeo"
+
+#: site_map.module:313
+msgid "Books"
+msgstr "Libros"
+
+#: site_map.module:314
+msgid "Books at %sn."
+msgstr "Libros de %sn."
+
+#: site_map.module:24
+msgid "access site map"
+msgstr "acceder al mapa del sitio"
+
+#: site_map.module:0
+msgid "site_map"
+msgstr "site_map"
+
+#: site_map.info:0
+msgid "Display a site map."
+msgstr "Mostar el mapa del sitio."
+

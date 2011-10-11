@@ -1,0 +1,4 @@
+name = "Welcome Block"
+description = "Defines a block with basic information of where resides each resource."
+core = "7.x"
+package = "Corporative Site"

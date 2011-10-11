@@ -1,0 +1,10 @@
+<ul>
+<li>The Date API uses PHP 5.2+ date functions for better date and timezone handling.</li>
+<li>The database query handling has been completely re-worked to take advantage of database timezone handling when available, with a fallback to the older and less reliable method of using offsets to do timezone adjustments.</li>
+<li>No more need for the adodb date library, historical dates earlier than 1970 and later than 2038 are handled without any external code.</li>
+<li>iCal integration is greatly improved, an iCal parser can parse events, alarms, most types of dates and timezones, duration, repeat rules, and more.</lI>
+<li>The Date API creates date elements that can be used by any module, including 'date_select', 'date_textfield', and 'date_timezone'.</li>
+<li>The Date Popup module creates a jQuery popup calendar date picker and time picker, and the element is available to other modules as a form type of 'date_popup'. </li>
+<li>The Date module now has lots of new ways to define default values -- you can set a the default to 'blank', 'now', or 'relative', where relative is something like '+90 days'. The End date has a separate default value, which can be the same as the Start date or do something different.</li>
+<li>The Date Repeat API module can be used by any other module. The Date module uses it to allow you to select 'repeating' as a type of multiple date, present the user with a form to select the repeat rules for their date, and then create all the multiple values that match those rules.</li>
+</ul>

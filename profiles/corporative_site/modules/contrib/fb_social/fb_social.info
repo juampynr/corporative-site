@@ -1,0 +1,9 @@
+name = "fb social"
+description = "Provides integration with Facebook social plugins"
+dependencies[] = "ctools"
+package = "Facebook Social Plugins"
+core =7.x
+
+configure = admin/config/user-interface/fb_social
+
+files[] = plugins/export_ui/fb_social_ctools_export_ui.inc

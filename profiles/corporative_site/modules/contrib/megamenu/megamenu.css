@@ -1,0 +1,174 @@
+/*=============================================================
+ * MEGA MENU
+ *-------------------------------------------------------------
+ * This style sheet is divided into the following 3 sections:
+ * 1 Fundamentals
+ *		1.1 Reset
+ *		1.2 Structure
+ * 		1.3 Default styles
+ * 2 User Overrides
+ *		2.1 Widths, margins, and padding
+ *		2.2 Vertical menu
+ *		2.3 Horizontal slots
+ * 3 Skins
+ *=============================================================*/
+
+/* @group Fundamentals */
+
+/* Reset
+ *------------------------------------------------------------*/
+ /* @group Reset */
+.megamenu-menu,
+.megamenu-menu *,
+.megamenu-menu .megamenu-parent,
+.megamenu-menu .megamenu-parent-title,
+.megamenu-menu .megamenu-bin,
+.megamenu-menu .megamenu-slot,
+.megamenu-menu .megamenu-slot-title,
+.megamenu-menu .megamenu-items {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	font-weight: normal;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+ul.megamenu-menu,
+.megamenu-menu ul.megamenu-items {
+	list-style: none;
+}
+/* @end */ 
+
+/* Structure
+ *------------------------------------------------------------*/
+/* @group Structure */
+.megamenu-menu {
+	overflow: visible; /* Contain floated elements */
+}
+
+.megamenu-menu .megamenu-parent {
+	display: inline;
+	position: relative;
+	z-index: 99;
+}
+
+.megamenu-menu .megamenu-parent-title {
+	display: inline;
+}
+
+.megamenu-menu .megamenu-bin {
+	position: absolute;
+	left: 0; /* Default horizontal orientation */
+	top: -9000px; /* default hidden position */
+	z-index: 10000;
+	overflow: hidden;
+	
+}
+
+/* Bin Alignment
+ *--------------------------------------------------------*/
+.megamenu-menu .megamenu-bin-right{
+					 left:auto;
+					 right:-500px;
+}
+
+/* @group Horizontal Links */
+.megamenu-menu .megamenu-links-horizontal {
+	overflow: hidden;
+}
+
+.megamenu-menu .megamenu-links-horizontal li, 
+.megamenu-menu .megamenu-links-horizontal li a {
+	float: left;
+}
+/* @end Horizontal Links */
+
+.megamenu-menu .megamenu-menu-vertical .megamenu-parent {
+	display: block;
+}
+
+/* @end Structure */
+
+
+
+
+/* Default styles
+ *--------------------------------------------------------*/
+/* @group Default styles */
+
+.megamenu-menu ul a {
+	text-decoration: none;
+}
+
+.megamenu-menu ul a:hover {
+	text-decoration: underline;
+}
+/* @end */
+/* @end Fundamentals */
+
+
+/* User Overrides
+ *
+ * This part will have to be dynamically generated in the 
+ * customization admin screen.  The user can specify the 
+ * proper widths for structural elements according to the 
+ * ID of the mega menu.
+ *--------------------------------------------------------*/
+/* @group Widths, Padding, & Margins */
+.megamenu-parent {
+	margin: 0.1em 1em; /* Left margin affects fly-out value */
+}
+
+.megamenu-menu .megamenu-bin {
+	padding: 0.5em;
+}
+
+.megamenu-menu .megamenu-slot {
+	width: 200px; /* move this to skins or php */
+	margin-bottom: 0.5em;
+}
+
+/* Vertical Orientation
+ *--------------------------------------------------------*/
+/* @group Vertical Menu */
+.megamenu-menu-vertical {
+	width: 8em;
+}
+.megamenu-menu-vertical .megamenu-parent {
+	margin-top: 1em;
+}
+.megamenu-slots.flyright {
+	left: 7em; /* [megamenu-menu-vertical] (width) - [megamenu-parent] (margin) */
+	top: 0;
+}
+
+.megamenu-slots.flyleft {
+	left: -16.2em; /* Calculation of this value did not seem straightforward */
+	top: 0;
+}
+/* @end */
+
+
+/* Horizontal Orientation
+ *--------------------------------------------------------*/
+/* @group Horizontal Slots */
+/* This value will have to be calculated to account for slot widths + margins */
+/* 2009.1009.1437 EFD: this width conflicted with our layout. it made more sense for us to set width on the slots themselves. unsure how the interface should handle this. */
+.megamenu-menu .megamenu-slots-columnar {
+	overflow: hidden; /* contain floated slots */
+}
+.megamenu-slots-columnar li.megamenu-slot {
+	float: left;
+}
+/* @end Horizontal Slots */
+/* @end Widths*/
+
+/* megamenu-menu end */
+
+/* Compatibilty with Admin Menu */
+.megamenu-menu {
+  z-index:10;
+}

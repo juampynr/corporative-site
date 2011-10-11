@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * Implementation of hook_views_api().
+ *
+ * This one is used as the base to reduce errors when updating.
+ */
+function calendar_ical_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'calendar_ical'),
+  );
+}
+
+/**
+ * @file
+ * Adds ical functionality to Calendar.
+ */
+function calendar_ical_theme() {
+  return array(
+    'calendar_ical_icon' => array(
+      'variables' => array('url'),
+      ),
+    );
+}
+
+function theme_calendar_ical_icon($vars) {
+  $url = $vars['url'];
+  $variables = array(
+    'path' => drupal_get_path('module', 'date_api') . '/images/ical16x16.gif', 
+    'title' => t('Add to calendar'), t('Add to calendar'),
+  );
+  if ($image = theme('image', $variables)) {
+    return '<div style="text-align:right"><a href="' . check_url($url) . '" class="ical-icon" title="ical">' . $image . '</a></div>';
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Add an 'iCal' view mode for nodes, similar to RSS view mode.
+ */
+function calendar_ical_entity_info_alter(&$info) {
+  $info['node']['view modes'] += array(
+    'ical' => array(
+      'label' => t('iCal'),
+      'custom settings' => FALSE,
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_views_plugins
+ */
+function calendar_ical_views_plugins() {
+  $module_path = drupal_get_path('module', 'calendar_ical');
+  module_load_include('inc', 'calendar_ical', 'theme.inc');
+
+  $data = array(
+    'module' => 'calendar_ical', // This just tells our themes are elsewhere.
+    'style' => array(
+      'ical' => array(
+        'title' => t('iCal Feed'),
+        'help' => t('Generates an iCal VCALENDAR feed from a view.'),
+        'handler' => 'calendar_plugin_style_ical',
+        'path' => "$module_path",
+        'theme' => 'calendar_style_ical',
+        'theme file' => 'theme.inc',
+        'theme path' => "$module_path",
+        'uses fields' => TRUE,
+        'uses grouping' => FALSE,
+        'uses row plugin' => TRUE,
+        'uses options' => TRUE,
+        'type' => 'feed',
+        'even empty' => TRUE,
+      ),
+    ),
+    'row' => array(
+      'ical_node' => array(
+        'title' => t('iCal Fields'),
+        'help' => t('Display each node as an iCal VEVENT item.'),
+        'handler' => 'calendar_plugin_row_ical_node',
+        'path' => "$module_path",
+        'theme' => 'calendar_row_ical_node',
+        'theme file' => 'theme.inc',
+        'theme path' => "$module_path",
+        'base' => array('node'), // only works with 'node' as base.
+        'uses options' => TRUE,
+        'uses fields' => FALSE,
+        'type' => 'feed',
+      ),
+    ),
+  );
+  return $data;
+}

@@ -1,0 +1,59 @@
+
+name = Nombre proyecto
+description = Theme personalizado para ..., creado por ideup!
+version = 1.0
+core = 7.x
+
+screenshot = img/screenshot.png
+
+
+; THEME SETTINGS
+; ***************************************************************************
+
+features[] = name
+features[] = favicon
+features[] = main_menu
+features[] = secondary_menu
+
+
+; CSS
+; ***************************************************************************
+
+stylesheets[all][] = css/reset.css
+stylesheets[all][] = css/styles.css
+
+
+; JAVASCRIPT
+; ***************************************************************************
+
+scripts[] = js/scripts.js
+
+
+; REGIONS
+; ***************************************************************************
+
+regions[page_top] = Page top
+regions[header] = Header
+regions[help] = Help
+regions[highlighted] = Highlighted content
+regions[content] = Main content
+regions[sidebar_first] = Sidebar
+regions[footer] = Footer
+regions[page_bottom] = Page bottom
+
+
+; CONTEXT LAYOUTS
+; ***************************************************************************
+
+; Layout: Left sidebar (default)
+	layouts[default][name] = "Left sidebar (default)"
+	layouts[default][description] = "Content with left sidebar"
+	layouts[default][template] = "page"
+	layouts[default][regions][] = "page_top"
+	layouts[default][regions][] = "header"
+	layouts[default][regions][] = "help"
+	layouts[default][regions][] = "highlighted"
+	layouts[default][regions][] = "sidebar_first"
+	layouts[default][regions][] = "content"
+	layouts[default][regions][] = "footer"
+	layouts[default][regions][] = "page_bottom"

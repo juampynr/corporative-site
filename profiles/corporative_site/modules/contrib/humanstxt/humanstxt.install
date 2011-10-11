@@ -1,0 +1,15 @@
+<?php
+// $Id: humanstxt.install,v 1.1.2.1 2011/01/29 18:38:56 pcambra Exp $
+
+/**
+ * @file
+ * Install file for humans.txt project.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function humanstxt_uninstall(){
+  variable_del('humanstxt');
+  variable_del('humanstxt_display_link');
+}

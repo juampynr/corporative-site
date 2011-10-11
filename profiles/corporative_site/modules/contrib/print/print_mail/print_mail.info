@@ -1,0 +1,17 @@
+name = "Send by e-mail"
+description = "Provides the capability to send the web page by e-mail"
+core=7.x
+package = "Printer, e-mail and PDF versions"
+dependencies[] = print
+files[] = print_mail.module
+files[] = print_mail.inc
+files[] = print_mail.admin.inc
+files[] = print_mail.install
+configure = admin/config/user-interface/print/email
+
+; Information added by drupal.org packaging script on 2011-07-21
+version = "7.x-1.0-alpha1"
+core = "7.x"
+project = "print"
+datestamp = "1311207167"
+

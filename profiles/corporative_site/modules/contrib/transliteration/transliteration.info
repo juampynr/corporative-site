@@ -1,0 +1,16 @@
+; $Id: transliteration.info,v 1.6 2010/03/15 06:45:57 smk Exp $
+name = Transliteration
+description = Converts non-latin text to US-ASCII and sanitizes file names.
+core = 7.x
+
+files[] = transliteration.module
+files[] = transliteration.inc
+files[] = transliteration.admin.inc
+files[] = transliteration.install
+
+; Information added by drupal.org packaging script on 2010-07-16
+version = "7.x-3.0-alpha1"
+core = "7.x"
+project = "transliteration"
+datestamp = "1279288507"
+

@@ -1,0 +1,48 @@
+/* Indent & Justify classes */
+
+.rteindent1 {
+  margin-left: 40px;
+}
+.rteindent2 {
+  margin-left: 80px;
+}
+.rteindent3 {
+  margin-left: 120px;
+}
+.rteindent4 {
+  margin-left: 160px;
+}
+.rteleft {
+  text-align: left;
+}
+.rteright {
+  text-align: right;
+}
+.rtecenter {
+  text-align: center;
+}
+.rtejustify {
+  text-align: justify;
+}
+.ibimage_left {
+  float: left;
+}
+.ibimage_right {
+  float: right;
+}
+
+/* CKEditor padding in IE */
+table.cke_editor fieldset { 
+  padding: 0 !important;
+}
+/* hack with ie and garland editing area size fix - [#733512] */
+.cke_editor{
+  display: table !important;
+}
+.cke_editor,#ie#bug {
+  display: inline-table !important;
+}
+/* Fix table border for Drupal's Seven theme - [#1020612] */
+.cke_dialog tr td:last-child {
+  border-right: 0;
+}

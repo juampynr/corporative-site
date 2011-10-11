@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the CKEditor feature.
+ */
+
+include_once('feature_ckeditor.features.inc');

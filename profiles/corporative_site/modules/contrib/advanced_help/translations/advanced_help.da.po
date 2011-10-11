@@ -1,0 +1,137 @@
+# Dansk translation of advanced_help (6.x-1.2)
+# Copyright (c) 2009 by the Dansk translation team
+# Generated from files:
+# advanced_help.module,v 1.41 2008/10/28 17:33:47 merlinofchaos
+# advanced_help.info,v 1.2 2008/04/19 16:45:57 merlinofchaos
+# advanced_help.install,v 1.3 2008/04/19 16:45:57 merlinofchaos
+# help_example.module,v 1.2 2008/04/19 16:45:57 merlinofchaos
+# help_example.info,v 1.3 2008/05/10 17:32:14 merlinofchaos
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: advanced_help (6.x-1.2)\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-28 07:04-0700\n"
+"PO-Revision-Date: 2009-05-28 16:04+0200\n"
+"Last-Translator: Morten Wulff <wulff@ratatosk.net>\n"
+"Language-Team: Dansk <dansk@klid.dk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);"
+
+#: advanced_help.module:415
+msgid "Home"
+msgstr "Hjem"
+
+#: advanced_help.module:129,196,399,447,735,53
+msgid "Help"
+msgstr "Hjælp"
+
+#: advanced_help.module:141
+msgid "Search results"
+msgstr "Søgeresultater"
+
+#: advanced_help.module:144
+msgid "Your search yielded no results"
+msgstr "Din søgning gav ingen resultater."
+
+#: advanced_help.module:325
+msgid "Please enter some keywords."
+msgstr "Indtast søgeord."
+
+#: advanced_help.module:610
+msgid "Up"
+msgstr "Op"
+
+#: advanced_help.module:184
+msgid "Enable the search module to search help."
+msgstr "Aktiver søgemodulet for at søge i hjælpeteksten."
+
+#: advanced_help.module:198
+msgid "@module help index"
+msgstr "@module hjælp"
+
+#: advanced_help.module:228
+msgid "Module help index"
+msgstr "Hjælp til modul"
+
+#: advanced_help.module:310,60
+msgid "Search help"
+msgstr "Søg i hjælp"
+
+#: advanced_help.module:403
+msgid "Missing help topic."
+msgstr "Manglende emne."
+
+#: advanced_help.module:424
+msgid "view advanced help topic"
+msgstr "vis hjælp"
+
+#: advanced_help.module:424
+msgid "view advanced help popup"
+msgstr "vis hjælp popup"
+
+#: advanced_help.module:424
+msgid "view advanced help index"
+msgstr "vis oversigt"
+
+#: advanced_help.module:45; advanced_help.info:0
+msgid "Advanced help"
+msgstr "Avanceret hjælp"
+
+#: advanced_help.module:0
+msgid "advanced_help"
+msgstr "advanced_help"
+
+#: advanced_help.install:23
+msgid "Stores search index correlations for advanced help topics."
+msgstr "Gemmer søgeindekskorrelationer for avancerede hjælpetekster."
+
+#: advanced_help.install:29
+msgid "The primary key to give to the search engine for this topic."
+msgstr "Den primære nøgle som gives til søgemaskinen for denne tekst."
+
+#: advanced_help.install:37
+msgid "The module that owns this topic."
+msgstr "Modulet som ejer denne tekst."
+
+#: advanced_help.install:44
+msgid "The topic id."
+msgstr "Emne ID"
+
+#: advanced_help.install:51
+msgid "The language this search index relates to."
+msgstr "Sproget som søgeindekset hører til."
+
+#: advanced_help.info:0
+msgid "Allow advanced help and documentation."
+msgstr "Tilbyd avanceret hjælp og dokumentation."
+
+#: help_example/help_example.module:24
+msgid ""
+"Click the help icon to view some example help about the PHP "
+"programming language (from wikipedia.org). Be sure to run cron to "
+"update the index if you want to try out the search features."
+msgstr ""
+"Klik på ikonet for at se et eksempel på hjælp til PHP "
+"programmeringssproget (fra wikipedia.org). Husk at køre cron for at "
+"opdatere indekset hvis du vil prøve søgefunktionen."
+
+#: help_example/help_example.module:14
+msgid "Example help"
+msgstr "Eksempel på hjælp"
+
+#: help_example/help_example.module:0
+msgid "help_example"
+msgstr "help_example"
+
+#: help_example/help_example.info:0
+msgid "Advanced help example"
+msgstr "Advanced Help eksempel"
+
+#: help_example/help_example.info:0
+msgid "A example help module to demonstrate the advanced help module."
+msgstr "Et modul som demonstrerer brugen af Advanced Help modulet."
+

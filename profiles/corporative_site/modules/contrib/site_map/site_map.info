@@ -1,0 +1,17 @@
+; $Id: site_map.info,v 1.5.2.1 2011/01/05 18:44:34 frjo Exp $
+name = Site map
+description = Display a site map.
+core = 7.x
+configure = admin/config/search/sitemap
+
+files[] = site_map.admin.inc
+files[] = site_map.install
+files[] = site_map.module
+files[] = site_map.theme.inc
+
+; Information added by drupal.org packaging script on 2011-01-05
+version = "7.x-1.0-beta1"
+core = "7.x"
+project = "site_map"
+datestamp = "1294253198"
+

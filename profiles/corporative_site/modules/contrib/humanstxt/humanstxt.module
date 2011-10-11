@@ -1,0 +1,100 @@
+<?php
+// $Id: humanstxt.module,v 1.1.2.2 2011/02/20 15:42:16 pcambra Exp $
+
+/**
+ * @file
+ * humanstxt module file.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function humanstxt_permission() {
+  return array(
+    'administer humans.txt' => array(
+      'title' => t('Administer humans.txt'),
+      'description' => t('Perform maintenance tasks for humans.txt.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function humanstxt_menu() {
+  $items['humans.txt'] = array(
+    'page callback' => 'humanstxt_file',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/config/search/humanstxt'] = array(
+    'title' => 'Humanstxt',
+    'description' => 'Manage your humans.txt file.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('humanstxt_admin_settings'),
+    'access arguments' => array('administer humans.txt'),
+    'file' => 'humanstxt.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Callback to display humans.txt file.
+ */
+function humanstxt_file() {
+  $content = array();
+  $content[] = _humanstxt_get_content();
+
+  // Trim any extra whitespace and filter out empty strings.
+  $content = array_map('trim', $content);
+  $content = array_filter($content);
+
+  drupal_add_http_header('Content-type', 'text/plain');
+  echo implode("\n", $content);
+  exit;
+}
+
+/**
+ * Helper function to get the content of the humans.txt file.
+ */
+function _humanstxt_get_content() {
+  $content = variable_get('humanstxt', FALSE);
+  if ($content === FALSE) {
+    $file = DRUPAL_ROOT . '/humanstxt.txt';
+    if (file_exists($file) && is_readable($file)) {
+      $content = file_get_contents($file);
+    }
+  }
+  return $content;
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function humanstxt_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+
+  switch ($phase) {
+    case 'runtime' :
+      // Module cannot work without Clean URLs.
+      if (!variable_get('clean_url', 0)) {
+        $requirements['humanstxt_cleanurl'] = array(
+          'title' => $t('Humanstxt'),
+          'severity' => REQUIREMENT_ERROR,
+          'value' => $t('<a href="!clean_url">Clean URLs</a> are mandatory for this module.', array('!clean_url' => url('admin/config/search/clean-urls'))),
+        );
+      }
+  }
+  return $requirements;
+}
+
+/**
+ * Preprocess function to display the <head> link if the user has selected so.
+ */
+function humanstxt_preprocess_html(&$variables) {
+  if (variable_get('humanstxt_display_link', FALSE)) {
+    drupal_add_html_head_link(array('type' => 'text/plain', 'rel' => 'author', 'href' => url('humans.txt', array('absolute' => TRUE))), TRUE);
+  }
+}

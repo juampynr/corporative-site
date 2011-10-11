@@ -1,0 +1,87 @@
+# translation of ca.po to
+# Copyright 2007 <fcojavmc@gmail.com>.
+# Fco. Javier M. C., 2007.
+# Fco. Javier M. C., 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: ca\n"
+"POT-Creation-Date: 2005-07-25 16:59+0200\n"
+"PO-Revision-Date: 2007-01-03 11:32+0100\n"
+"Last-Translator: Fco. Javier M. C.\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Language: Catalan\n"
+"X-Poedit-Country: CATALAN\n"
+"X-Generator: KBabel 1.10.2\n"
+"Language-Team: \n"
+
+#: site_map.module:13
+msgid "Display a site map."
+msgstr "Visualitza el mapa del web"
+
+#: site_map.module:35
+msgid "Site map message"
+msgstr "Missatge del mapa del web"
+
+#: site_map.module:35
+msgid "Define a message to be displayed above the site map."
+msgstr "Defineix un missatge per mostrarse sobre el mapa de la web"
+
+#: site_map.module:36
+msgid "Show node counts by categories"
+msgstr "Mostra el nombre de nodes per categoria"
+
+#: site_map.module:36
+msgid "When enabled, this option will show the number of nodes in each taxonomy term."
+msgstr "Quan és activa, aquesta opció mostrará el nombre de nodes en cada terme de taxonomy"
+
+#: site_map.module:37
+msgid "Include navigation menus"
+msgstr "Adjunta el menús de navegació"
+
+#: site_map.module:37
+msgid "When enabled, this option will include the fully-expanded top-level navigation menus in the site map"
+msgstr "Quan és activa, aquesta opció incluirá el menú de navegació desplegat en el mapa del web"
+
+#: site_map.module:38
+msgid "Include RSS links by categories"
+msgstr "Adjunta el enllaç RSS de cada categoria"
+
+#: site_map.module:38
+msgid "When enabled, this option will show links to the RSS feeds for each category."
+msgstr "Quan és activa, aquesta opció mostrará els enllaços RSS per a cada categoria"
+
+#: site_map.module:39
+msgid "RSS feed depth"
+msgstr "Profunditat de l'RSS"
+
+#: site_map.module:39
+msgid "Specify how many subcategories should be included in the RSS feed.  Enter \"all\" to include all subcategories or \"0\" to include no subcategories."
+msgstr "Especifica quantes subcategories s'han d'incloure a RSS. Escriu \"all\" per incloure totes les subcategories o \"0\" per no incloure subcategories."
+
+#: site_map.module:48
+msgid "Categories to include in the site map"
+msgstr "Categories per ser incloses al mapa del web"
+
+#: site_map.module:59
+msgid "site map"
+msgstr "Mapa del web"
+
+#: site_map.module:140
+msgid "RSS"
+msgstr "RSS"
+
+#: site_map.module:28
+msgid "access site map"
+msgstr "accés al mapa del web"
+
+#: site_map.module:28
+msgid "administer site map"
+msgstr "administra el mapa del web"
+
+#: site_map.module:0
+msgid "site_map"
+msgstr "mapa del web"
+

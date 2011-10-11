@@ -1,0 +1,724 @@
+<?php
+
+
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function fb_social_fb_social() {
+  $r = fb_social_fb_plugin_load();
+  $d = ctools_plugin_get_plugin_type_info();
+  dpm($d);
+  return 'fb_social';
+  
+}
+
+/**
+ * Implements hook_ctools_plugin_type() to inform the plugin system 
+ * owns 'fb_plugin' plugin types.
+ *
+ * "process" tells ctools that by default each 
+ * plugin has some default functions named consistently 
+ * after the plugin name
+ * @see _fb_social_ctools_plugin_fb_plugin_process()
+ */
+function fb_social_ctools_plugin_type(){
+  
+  return array(
+    'fb_plugin' => array(
+      'process' => '_fb_social_ctools_plugin_fb_plugin_process' 
+    ) 
+  )
+  ;
+}
+
+// ctools hooks / api
+
+
+/**
+ * Implementation of hook_ctools_plugin_api().
+ */
+function fb_social_ctools_plugin_api($module, $api){
+  if ($module == 'fb_social' && $api == 'plugins') {
+    return array(
+      'version' => 1 
+    );
+  }
+  
+  //boxes
+  if ($module == 'boxes' && $api == 'plugins') {
+    return array(
+      'version' => 1 
+    );
+  }
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function fb_social_ctools_plugin_directory($module, $type){
+
+    return 'plugins/' . $type;
+
+}
+
+/**
+ * Helper function for ctools plugin 'process' 
+ * @param $plugin
+ * @param $info
+ * @see fb_social_ctools_plugin_fb_plugin()
+ */
+function _fb_social_ctools_plugin_fb_plugin_process(&$plugin, $info){
+   $plugin['default values'] = $plugin['name'].'_defaults';
+   $plugin['fb plugin form'] = $plugin['name'].'_fb_settings';
+   $plugin['drupal settings form']= $plugin['name'].'_drupal_settings';
+   $plugin['preprocess options callback']= $plugin['name'].'_preprocess_options';
+   
+}
+
+
+
+/**
+ * Minimum CTools version needed.
+ */
+//define('FB_SOCIAL_REQUIRED_CTOOLS_API', '1.7.1');
+
+/**
+ * Implements hook_rdf_namespaces().
+ */
+function fb_social_rdf_namespaces() {
+  return array(
+    'og'      => 'http://ogp.me/ns#',
+    'fb'      => 'http://www.facebook.com/2008/fbml',
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function fb_social_menu() {
+  $items = array();
+
+  $items['fb_social'] = array(
+    'title' => t('fb_social'),
+    'page callback' => 'fb_social_fb_social',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  
+  $items['fb_social/channel'] = array(
+    'type' => MENU_CALLBACK,
+    'description' => 'Facebook Custom Channel URL',
+    'page callback' => 'fb_social_custom_channel_url',
+    'access callback' => TRUE,
+  );
+
+  $items['admin/config/user-interface/fb_social'] = array(
+    'title' => 'Facebook social',
+    'description' => 'Settings for facebook social plugins.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'fb_social_admin_settings_form',
+    ),
+    'file' => 'fb_social.admin.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array(
+      'administer site configuration',
+    ),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function fb_social_block_info(){
+  $blocks = array();
+  
+  // load all presets
+  $presets = fb_social_get_presets();
+
+  foreach ( $presets as $preset ) {
+    if ($preset->settings['block']) {
+      $blocks[$preset->name] = array(
+        'info' => $preset->name . ' block' 
+      );
+    }
+  }
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function fb_social_block_view($delta){
+  if ($preset = fb_social_get_presets($name = $delta)) {
+    $block['subject'] = t('');
+    $block['content'] = fb_social_preset_view($preset);
+    return $block;
+  }
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function fb_social_theme() {
+  return array(
+    'fb_social_plugin' => array(
+      'variables' => array(
+        'plugin_type' => NULL,
+        'tag_name' => NULL,
+        'attributes' => NULL, 
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_content_extra_fields.
+ */
+function fb_social_field_extra_fields(){
+  $extras = array();
+  $presets = fb_social_get_presets();
+
+  foreach ( $presets as $preset ) {
+    $plugin = fb_social_fb_plugin_load($preset->plugin_type);
+    $function = ctools_plugin_get_function($plugin, 'content_extra_fields callback');
+    if ($function) {
+      $function($extras, $preset);
+    }
+  }
+  return $extras;
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function fb_social_node_view($node, $view_mode = 'full'){
+  
+  // preset in links area
+  $links = fb_social_link('node', $node, $view_mode == 'teaser');
+  if ($links) {
+    $node->content['links']['fb_social_like'] = array(
+        '#theme' => 'links__node__fb_social', 
+        '#links' => $links, 
+        '#attributes' => array(
+            'class' => array(
+                'links', 
+                'inline' 
+            ) 
+        ) 
+    );
+  }
+  
+  $presets = fb_social_get_presets();
+  
+  foreach ( $presets as $preset ) {
+    $plugin = fb_social_fb_plugin_load($preset->plugin_type);
+    $function = ctools_plugin_get_function($plugin, 'nodeapi_view callback');
+    if ($function) {
+      $function($preset, $node, $view_mode);
+    }
+  }
+}
+
+/**
+ *Fake hook_link (as in D6); for easy maintanance only
+ */
+function fb_social_link($type, $object, $teaser = FALSE){
+  $presets = fb_social_get_presets();
+  foreach ( $presets as $preset ) {
+    $plugin = fb_social_fb_plugin_load($preset->plugin_type);
+    $function = ctools_plugin_get_function($plugin, 'hook_link callback');
+    if ($function) {
+      return $function($preset, $type, $object, $teaser);
+    }
+  }
+}
+
+
+
+
+
+// ctools wrapper functions for 'fb_plugin"
+
+/**
+ * load a specific fb_plugin or all of them
+ */
+function fb_social_fb_plugin_load($type = NULL){
+  ctools_include('plugins');
+  $plugins = ctools_get_plugins('fb_social', 'fb_plugin');
+  if (isset($type)){
+    return $plugins[$type];
+  }
+  
+  return $plugins;
+}
+
+/**
+ * Return the default vaules of a certain plugin 
+ * type as defined by facebook
+ * @param $type the plugin type/name (i.e. like).
+ */
+function fb_social_fb_plugin_defaults($type){
+  $plugin = fb_social_fb_plugin_load($type);
+
+  $function = ctools_plugin_get_function($plugin, 'default values');
+  if ($function){
+    return $function();
+  }
+  
+  return array();
+}
+
+/**
+ * Return the facebook plugin form for a given type
+ * @param $type the plugin type/name (i.e. like).
+ */
+function fb_social_fb_plugin_fb_settings_form($type, $options){
+  $form = array();
+  $plugin = fb_social_fb_plugin_load($type);
+
+  $function = ctools_plugin_get_function($plugin, 'fb plugin form');
+  if ($function){
+    $form = $function($options);
+  }
+
+  return $form;
+}
+
+/**
+ * Return the drupal settings form for a given plugin type
+ * @param $type the plugin type/name (i.e. like).
+ */
+function fb_social_fb_plugin_drupal_settings_form($type, $options){
+  $form = array();
+
+  $plugin = fb_social_fb_plugin_load($type);
+
+  $function = ctools_plugin_get_function($plugin, 'drupal settings form');
+  if ($function){
+    $form = $function($options);
+  }
+
+  return $form;
+}
+
+/**
+ * Fake preprocess function
+ */
+function fb_social_fb_plugin_preprocess_options($type, &$options){
+  $plugin = fb_social_fb_plugin_load($type);
+
+  $function = ctools_plugin_get_function($plugin, 'preprocess options callback');
+  if ($function){
+    $function($options);
+  }
+
+}
+
+// ctools wrapper functions for "fb social preset"
+
+/**
+ * load the preset
+ * @param $name
+ *    the preset name
+ * @param $reset
+ */
+function fb_social_preset_load($name = NULL, $reset = FALSE){
+  ctools_include('export');
+  if ($reset) {
+    ctools_export_load_object_reset('fb_social_preset');
+  }
+  $presets = ctools_export_load_object('fb_social_preset', 'all');
+
+  if (isset($name)) {
+    return isset($presets[$name]) ? $presets[$name] : FALSE;
+  }
+  
+  return $presets;
+}
+
+/**
+ * Get all presets or a preset by name. By default
+ * it returns only enabled presets.
+ * 
+ * @param $name
+ *    the preset name
+ * @param $enabled
+ *    
+ * @param $reset
+ */
+function fb_social_get_presets($name = NULL, $enabled = TRUE, $reset = FALSE){
+
+  $presets = fb_social_preset_load($name, $reset);
+
+  if (empty($presets)){
+    return FALSE;
+  }
+  
+  if (is_object($presets)){
+    $presets = array($presets -> name => $presets);
+  }
+  
+  if ($enabled ) {
+    $presets = array_filter($presets, '_fb_social_enabled_presets_filter');
+  }
+  
+  if (isset($name)) {
+    return isset($presets[$name]) ? $presets[$name] : FALSE;
+  }
+  
+  return $presets;
+}
+
+/**
+ * filter presets based on come conditions $args
+ * @see ctools_export_load_object()
+ */
+function _fb_social_enabled_presets_filter($preset){
+  return (isset($preset -> disabled) && ($preset -> disabled)) ? FALSE : TRUE;
+}
+
+function fb_social_get_presets_by_type($type, $en = TRUE){
+  $result = array(); 
+  $presets = fb_social_get_presets( $name = NULL, $enabled = $en);
+  foreach ($presets as $preset){
+    if ($preset -> plugin_type == $type){
+      $result[] = $preset;
+    }
+  }
+  
+  return $result;
+}
+
+
+  // boxes integration
+/**
+ * Implementation of hook_boxes_plugins().
+ */
+function fb_social_boxes_plugins(){
+  $info = array();
+  $path = drupal_get_path('module', 'fb_social') . '/plugins/boxes';
+  
+  $info['fb_social_default'] = array(
+    'title' => '',  // important . We dont /box-add/fb_social_boxes_default
+    'handler' => array(
+      'class' => 'fb_social_default', 
+      'file' => 'fb_social_default.inc', 
+      'path' => $path, 
+      'parent' => 'box' 
+    ) 
+  );
+  
+  $info['fb_social_like'] = array(
+    'title' => 'facebook social like', 
+    'handler' => array(
+      'class' => 'fb_social_like', 
+      'file' => 'fb_social_like.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  $info['fb_social_likebox'] = array(
+    'title' => 'facebook social likebox', 
+    'handler' => array(
+      'class' => 'fb_social_likebox', 
+      'file' => 'fb_social_likebox.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  $info['fb_social_send'] = array(
+    'title' => 'facebook social send', 
+    'handler' => array(
+      'class' => 'fb_social_send', 
+      'file' => 'fb_social_send.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  $info['fb_social_facepile'] = array(
+    'title' => 'facebook social facepile', 
+    'handler' => array(
+      'class' => 'fb_social_facepile', 
+      'file' => 'fb_social_facepile.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  $info['fb_social_livestream'] = array(
+    'title' => 'facebook social livestream', 
+    'handler' => array(
+      'class' => 'fb_social_livestream', 
+      'file' => 'fb_social_livestream.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  $info['fb_social_comments'] = array(
+    'title' => 'facebook social comments', 
+    'handler' => array(
+      'class' => 'fb_social_comments', 
+      'file' => 'fb_social_comments.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  // Truncate the name of the plugin because the delta column in the blocks
+  // table is limited to 32 characters.
+  
+  $info['fb_social_recommend'] = array(
+    'title' => 'facebook social recommendations', 
+    'handler' => array(
+      'class' => 'fb_social_recommendations', 
+      'file' => 'fb_social_recommendations.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  $info['fb_social_activityf'] = array(
+    'title' => 'facebook social activity feed', 
+    'handler' => array(
+      'class' => 'fb_social_activityfeed', 
+      'file' => 'fb_social_activityfeed.inc', 
+      'path' => $path, 
+      'parent' => 'fb_social_default' 
+    ) 
+  );
+  
+  return $info;
+}
+
+/**
+ * returns the fbml content of the plugin
+ */
+function fb_social_preset_view($preset){
+  
+  $plugin_type = $preset->plugin_type;
+  
+  $attributes = $preset->fb_attrs;
+  
+  // replace '0' with 'FALSE' and '1' with 'TRUE'
+  fb_social_fb_plugin_preprocess_options($plugin_type, $attributes);
+  
+  $attributes = drupal_attributes($attributes);
+  
+  $plugin = fb_social_fb_plugin_load($plugin_type);
+  
+  return theme('fb_social_plugin', $variables = array(
+    'plugin_type' => $plugin_type, 
+    'tag_name' => $plugin['html tag name'], 
+    'attributes' => $attributes 
+  ));
+}
+
+function theme_fb_social_plugin($variables){
+  
+  return '<div class="fb-social-' . $variables['plugin_type'] . '-plugin"><fb:' . $variables['tag_name'] . ' ' . $variables['attributes'] . '></fb:' . $variables['tag_name'] . '></div>';
+}
+
+/**
+ * returns the fbml content of the plugin
+ */
+function fb_social_box_view($box){
+
+  $attributes = $box->options;
+
+  $plugin_type = $box->fb_plugin_name;
+  $plugin = fb_social_fb_plugin_load($plugin_type);
+  // replace '0' with 'FALSE' and '1' with 'TRUE'
+  fb_social_fb_plugin_preprocess_options($plugin_type, $attributes);
+  $attributes = drupal_attributes(array_filter($attributes));
+  
+  return theme('fb_social_plugin', $variables = array(
+    'plugin_type' => $plugin_type, 
+    'tag_name' => $plugin['html tag name'], 
+    'attributes' => $attributes 
+  ));
+}
+
+/**
+ * Implements hook_footer().
+ */
+function fb_social_page_alter(&$page){
+  global $language, $_fb_script_init, $base_url;
+  
+  // If their is no fb plugin enabled on this page, do not load fb script then
+  //if (! $_fb_script_init) {
+  //  return;
+  //}
+  
+  $languages = _map_active_languages();
+  
+  if (fb_social_auto_language()) {
+    if (array_key_exists($language->language, $languages)) {
+      $fb_locale = $languages[$language->language];
+    }
+    else {
+      drupal_set_message("There is no mapping for the current language. Using the default locale.");
+    }
+  }
+  else {
+    $fb_locale = variable_get('fb_social_locale', 'en_US');
+  }
+  
+  $appid = variable_get('fb_social_appid', '');
+  $channel_url = $base_url . "/fb_social/channel";
+  
+  $output = '<div id="fb-root"></div>';
+  $output .= "<script type=\"text/javascript\">
+     window.fbAsyncInit = function() {
+       FB.init({
+         appId: " . drupal_json_encode($appid) . ",
+         status: true,
+         cookie: true,
+         xfbml: true,
+         channelUrl: " . drupal_json_encode($channel_url) . "
+         });
+
+         ";
+  // let each module subscribe to different events
+  $output .= implode("\n", module_invoke_all('fb_social_event_subscribe'));
+  $output .= "
+     };
+     (function() {
+       var e = document.createElement('script');
+       e.async = true;
+       e.src = document.location.protocol + '//connect.facebook.net/" . $fb_locale . "/all.js';
+       document.getElementById('fb-root').appendChild(e);
+     }());
+  </script>";
+  
+  $page['page_bottom']['fb_social'] = array(
+    '#markup' => $output 
+  );
+  
+  // set fb appid as administrator to moderate comments etc
+  // see "moderation tools section at http://developers.facebook.com/docs/reference/plugins/comments/
+  
+
+  $element = array(
+    '#tag' => 'meta', 
+    '#attributes' => array( // Set up an array of attributes inside the tag
+      'property' => 'fb:app_id', 
+      'content' => check_plain(variable_get('fb_social_appid', '')) 
+    ) 
+  );
+  drupal_add_html_head($element, 'fb_social_fbadmin');
+}
+
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function fb_social_auto_language() {
+  return variable_get('fb_social_locale_auto', 0);
+}
+
+function _map_active_languages() {
+  $languages = language_list();
+  $mapped = array();
+  foreach ( $languages as $key => $language ) {
+    $mapped[$language->language] = variable_get('fb_social_language_' . $language->language, '');
+  }
+  return $mapped;
+}
+
+/**
+ * The Custom Channel URL that FB.init has as an option
+ */
+function fb_social_custom_channel_url() {
+  header("Cache-Control: public, s-maxage=31536000, max-age=31536000");
+  header("Expires: Sun, 1 Oct 2079 00:00:00 GMT");
+  
+  global $language;
+  $languages = _map_active_languages();
+  $fb_locale = "en_US";
+
+  if (fb_social_auto_language()) {
+    if (array_key_exists($language->language, $languages)) {
+      $fb_locale = $languages[$language->language];
+    }
+  }
+  else {
+    $fb_locale = variable_get('fb_social_locale', 'en_US');
+  }
+  print '<script src="http://connect.facebook.net/' . $fb_locale . '/all.js"></script>';
+  exit;
+}
+
+
+// API functions
+
+/**
+ * Implementation of hook_fb_social_event_subscribe
+ */
+function fb_social_like_fb_social_event_subscribe() {
+  // integration with google analytics
+  if (module_exists('googleanalytics')) {
+    global $user;
+    $id = variable_get('googleanalytics_account', '');
+    if (!empty($id) && _googleanalytics_visibility_pages() && _googleanalytics_visibility_user($user)) {		
+      return array('FB.Event.subscribe("edge.create", function(href, widget) {',
+        '_gaq.push(["_trackEvent", "Facebook like", "Drupal", href]);',
+      '});');
+    }
+  }
+}
+
+
+/**
+ *  Based on the user settings return the aliased / unaliased version
+ *  of a given $url
+ *
+ *  If option is selected, the base URL is rewritten to the specified value.
+ *  If option is selected, the language tag is stripped from the URL.
+ */
+function fb_social_url($url = NULL) {
+  $aliased = variable_get('fb_social_urls_mode', 0);
+  $base_url = variable_get('fb_social_base_url', '');
+  $strip_lang = variable_get('fb_social_url_strip_lang', 0);
+
+  $url =  url($url, array_filter(array(
+    'absolute' => TRUE,
+    'alias' => $aliased,
+    'base_url' => $base_url,
+  )));
+  
+  if ($strip_lang) {
+    global $language;
+    $lang_tag = "/" . $language->language . "\//";
+    $url = preg_replace($lang_tag, '', $url, 1);
+  }
+
+  return $url;
+}
+
+// helper functions 
+
+
+/**
+ * Does $preset should be shown on node of type $type
+ */
+function fb_social_preset_node_types($preset, $node_type){
+  $types = ($preset->settings['node_types']['types']);
+  if (! is_array($types)) {
+    return FALSE;
+  }
+  
+  return (!empty($types[$node_type]));
+}
+
+
+
+

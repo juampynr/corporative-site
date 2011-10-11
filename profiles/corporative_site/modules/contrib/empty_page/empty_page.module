@@ -1,0 +1,199 @@
+<?php
+
+/**
+ *
+ * @file
+ * Empty Page module
+ * A simple empty page solution. Assists in creating empty menu callbacks, mostly used for pages that only consist of blocks.
+ *
+ */
+
+define('EMPTY_PAGE_PERM_ADMIN_CALLBACKS', 'administer empty page callbacks');
+
+/**
+ * Implements hook_permission().
+ */
+function empty_page_permission() {
+  $permissions = array(
+    EMPTY_PAGE_PERM_ADMIN_CALLBACKS => array(
+      'title' => 'Administer Empty Page callbacks',
+      'description' => 'Perform management tasks for Empty Page callbacks.',
+    ),
+  );
+  return $permissions;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function empty_page_menu() {
+  $items = array();
+
+  $items['admin/structure/empty-page'] = array(
+    'title' => 'Empty Page callbacks',
+    'description' => 'Manage Empty Page menu callbacks.',
+    'page callback' => 'empty_page_admin_overview',
+    'access arguments' => array(EMPTY_PAGE_PERM_ADMIN_CALLBACKS),
+    'file' => 'empty_page.admin.inc',
+  );
+
+  $items['admin/structure/empty-page/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['admin/structure/empty-page/add'] = array(
+    'title' => 'Add Callback',
+    'description' => 'Create an empty page.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('empty_page_callbacks_form'),
+    'access arguments' => array(EMPTY_PAGE_PERM_ADMIN_CALLBACKS),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'empty_page.admin.inc',
+    'weight' => 1,
+  );
+
+  $items['admin/structure/empty-page/%/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('empty_page_callbacks_form', 3),
+    'access arguments' => array(EMPTY_PAGE_PERM_ADMIN_CALLBACKS),
+    'type' => MENU_CALLBACK,
+    'file' => 'empty_page.admin.inc',
+  );
+
+  $items['admin/structure/empty-page/%/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('empty_page_admin_delete_form', 3),
+    'access arguments' => array(EMPTY_PAGE_PERM_ADMIN_CALLBACKS),
+    'type' => MENU_CALLBACK,
+    'file' => 'empty_page.admin.inc',
+  );
+
+  // Create the dynamic callbacks.
+  foreach (empty_page_get_callbacks() as $cid => $callback) {
+    $items[$callback->path] = array(
+      'title' => t($callback->page_title),
+      'page callback' => 'empty_page_empty',
+      'access callback' => TRUE,
+      'type' => MENU_SUGGESTED_ITEM,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function empty_page_theme(&$existing, $type, $theme, $path) {
+  $hooks = array();
+  $hooks['empty_page_callbacks_manage_render'] = array(
+    'file' => 'empty_page.admin.inc',
+  );
+  return $hooks;
+}
+
+/**
+ * An Empty Page callback's empty content.
+ *
+ * @return string $output
+ */
+function empty_page_empty() {
+  return '';
+}
+
+
+/**
+ *
+ * API
+ *
+ */
+
+
+/**
+ * Get all Empty Page callbacks.
+ *
+ * @return $callbacks
+ */
+function empty_page_get_callbacks() {
+  $callbacks = array();
+  $results = db_select('empty_page')
+    ->fields('empty_page', array('cid', 'path', 'page_title', 'data', 'changed', 'created'))
+    ->orderBy('changed', 'DESC')
+    ->execute();
+  foreach ($results as $callback) {
+    $callbacks[$callback->cid] = $callback;
+  }
+  return $callbacks;
+}
+
+/**
+ * Get an Empty Page callback.
+ *
+ * @param int $cid
+ * @return object $callback
+ */
+function empty_page_get_callback($cid) {
+  $callback = db_select('empty_page')
+    ->fields('empty_page', array('cid', 'path', 'page_title', 'data', 'changed', 'created'))
+    ->condition('cid', $cid)
+    ->execute()
+    ->fetchObject();
+  return $callback;
+}
+
+/**
+ * Save an Empty Page callback.
+ *
+ * @param object $callback
+ * @return int $cid
+ */
+function empty_page_save_callback($callback) {
+  if (property_exists($callback, 'cid')) {
+    db_update('empty_page')
+      ->fields(array(
+        'path' => $callback->path,
+        'page_title' => $callback->page_title,
+        'changed' => REQUEST_TIME,
+      ))
+      ->condition('cid', $callback->cid)
+      ->execute();
+    $ret = $callback->cid;
+  }
+  else {
+    $id = db_insert('empty_page')
+      ->fields(array(
+        'path' => $callback->path,
+        'page_title' => $callback->page_title,
+        'created' => REQUEST_TIME,
+        'changed' => REQUEST_TIME,
+      ))
+      ->execute();
+    $ret = $id;
+  }
+  return $ret;
+}
+
+/**
+ * Delete an Empty Page callback.
+ *
+ * @param int $cid
+ * @return (sql result resource or FALSE)
+ */
+function empty_page_delete_callback($cid) {
+  if (is_numeric($cid)) {
+    db_delete('empty_page')
+      ->condition('cid', $cid)
+      ->execute();
+  }
+}
+
+/**
+ * Helper function for cleaning / rebuilding menu.
+ */
+function empty_page_clear_menu_cache() {
+  // Rebuild menu.
+  menu_rebuild();
+}

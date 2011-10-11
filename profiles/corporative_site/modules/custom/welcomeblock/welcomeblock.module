@@ -1,0 +1,40 @@
+<?php
+/**
+ * @file
+ *   Implements a welcome block
+ */
+
+/**
+ * Implementation of hook_block_info().
+ */
+function welcomeblock_block_info() {
+  $blocks['welcome'] = array(
+    'info' => t('Welcome to your site'),
+  );
+  return $blocks;
+}
+ 
+/**
+ * Implementation of hook_block_view().
+ */
+function welcomeblock_block_view($delta='') {
+  $block = array();
+  switch ($delta) {
+    case 'welcome':
+      $block['subject'] = t('Welcome to your site');
+      $block['content'] = theme('welcome'); 
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function welcomeblock_theme() {
+  return array(
+    'welcome' => array(
+      'template' => 'welcome',
+    ),
+  );
+}

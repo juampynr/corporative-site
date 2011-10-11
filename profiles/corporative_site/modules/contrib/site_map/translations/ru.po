@@ -1,0 +1,214 @@
+# translation of site_map-module.po to russian
+# $Id: ru.po,v 1.2 2010/01/04 05:24:46 frjo Exp $
+# LANGUAGE translation of Drupal (site_map.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  site_map.module,v 1.31 2007/05/28 02:08:11 frjo
+#  site_map.info,v 1.1 2006/11/05 12:27:56 frjo
+#
+# Vlad Savitsky <vlad_savitsky@mail.ru>, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: site_map-module\n"
+"POT-Creation-Date: 2007-05-28 11:44+0200\n"
+"PO-Revision-Date: 2008-06-11 12:07+0300\n"
+"Last-Translator: Vlad Savitsky <vlad_savitsky@mail.ru>\n"
+"Language-Team: russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: site_map.module:35
+msgid "Site map message"
+msgstr "Сообщение карты сайта"
+
+#: site_map.module:39
+msgid "Define a message to be displayed above the site map."
+msgstr "Укажите, какое сообщение должно отображаться над картой сайта."
+
+#: site_map.module:44
+msgid "Site map content"
+msgstr "Содержание карты сайта"
+
+#: site_map.module:48
+msgid "Show front page"
+msgstr "Показывать главную страницу"
+
+#: site_map.module:51
+msgid "When enabled, this option will include the front page in the site map."
+msgstr "Когда включено, показывает ссылку на главную страницу и RSS ленты к ней."
+
+#: site_map.module:55
+msgid "Show recent blog authors"
+msgstr "Показывать недавно обновившихся блоггеров"
+
+#: site_map.module:58
+msgid "When enabled, this option will show the recent blog authors."
+msgstr "Когда включено, показывает список недавно обновившихся блоггеров, ссылки на их блоги и RSS ленты к ним."
+
+#: site_map.module:70
+msgid "Books to include in the site map"
+msgstr "Книги, которые включаются в карту сайта"
+
+#: site_map.module:74;85;100
+msgid "Ctrl-click (Windows) or Command-click (Mac) to select more than one value."
+msgstr "Ctrl-клик (Windows) или Command-клик (Mac) для выбора более, чем одного варианта."
+
+#: site_map.module:81
+msgid "Menus to include in the site map"
+msgstr "Меню, включаемые в карту сайта"
+
+#: site_map.module:96
+msgid "Categories to include in the site map"
+msgstr "Категории, включаемые в карту сайта"
+
+#: site_map.module:105
+msgid "Categories settings"
+msgstr "Настройки категорий"
+
+#: site_map.module:109
+msgid "Show books expanded"
+msgstr "Показывать книги в развернутом виде"
+
+#: site_map.module:112
+msgid "When enabled, this option will show all children pages for each book."
+msgstr "Когда включено, будут показываться все страницы для каждой книги."
+
+#: site_map.module:116
+msgid "Show node counts by categories"
+msgstr "Показывать количество материалов по категориям"
+
+#: site_map.module:119
+msgid "When enabled, this option will show the number of nodes in each taxonomy term."
+msgstr "Когда включено, будет показываться количество материалов для каждого термина таксономии."
+
+#: site_map.module:123
+msgid "Categories depth"
+msgstr "Глубина категорий"
+
+#: site_map.module:127
+msgid "Specify how many subcategories should be included on the categorie page. Enter \"all\" to include all subcategories,\"0\" to include no subcategories, or \"-1\" not to append the depth at all."
+msgstr "Укажите, сколько подкатегорий должно быть включено в страницу категорий. Введите \"all\" чтобы включить все подкатегории, \"0\" чтобы исключить все подкатегории или \"-1\" чтобы не учитывать глубину вообще."
+
+#: site_map.module:132
+msgid "RSS settings"
+msgstr "Настройки RSS"
+
+#: site_map.module:136
+msgid "Include RSS links"
+msgstr "Включать ссылки на RSS ленты"
+
+#: site_map.module:139
+msgid "When enabled, this option will show links to the RSS feeds for each category and blog."
+msgstr "Когда включено, для каждой категории и каждого блога будут показываться ссылки на RSS ленты."
+
+#: site_map.module:143
+msgid "RSS feed depth"
+msgstr "Глубина RSS лент"
+
+#: site_map.module:147
+msgid "Specify how many subcategories should be included in the RSS feed. Enter \"all\" to include all subcategories or \"0\" to include no subcategories."
+msgstr "Укажите, сколько подкатегорий должно быть включено в RSS ленту. Введите \"all\" чтобы включить все подкатегории или \"0\" чтобы исключить все подкатегории."
+
+#: site_map.module:162;171 site_map.info:0
+msgid "Site map"
+msgstr "Карта сайта"
+
+#: site_map.module:163
+msgid "Control what should be displayed on the site map."
+msgstr "Управляет настройками показа элементов карты сайта"
+
+#: site_map.module:186
+msgid "Syndicate (site map)"
+msgstr "Синдикация (карта сайта)"
+
+#: site_map.module:191
+msgid "Syndicate"
+msgstr "Сбор новостей"
+
+#: site_map.module:200
+msgid "more"
+msgstr "подробнее"
+
+#: site_map.module:200
+msgid "View the site map to see more RSS feeds."
+msgstr "Посмотреть карту сайта чтобы увидеть больше RSS лент."
+
+#: site_map.module:222
+msgid "Link to a content RSS feed"
+msgstr "Это ссылка на RSS ленту материалов"
+
+#: site_map.module:224
+msgid "Link to a comment RSS feed"
+msgstr "Это ссылка на RSS ленту комментариев"
+
+#: site_map.module:256
+msgid "Front page"
+msgstr "Стартовая страница"
+
+#: site_map.module:257
+msgid "Front page of %sn"
+msgstr "Главная страница %sn"
+
+#: site_map.module:268
+msgid "Blogs"
+msgstr "Блоги"
+
+#: site_map.module:269
+msgid "Community blog and recent blog authors at %sn."
+msgstr "Общий блог и недавно обновившиеся блоги"
+
+#: site_map.module:272
+msgid "All blogs"
+msgstr "Общий блог"
+
+#: site_map.module:278
+msgid "!s's blog"
+msgstr "Блог пользователя !s"
+
+#: site_map.module:289
+msgid "Audio"
+msgstr "Аудио"
+
+#: site_map.module:290
+msgid "Audio content"
+msgstr "Аудио материал"
+
+#: site_map.module:299
+msgid "Video"
+msgstr "Видео"
+
+#: site_map.module:300
+msgid "Video content"
+msgstr "Видео материал"
+
+#: site_map.module:312
+msgid "Books"
+msgstr "Книги"
+
+#: site_map.module:313
+msgid "Books at %sn."
+msgstr "Книги:"
+
+#: site_map.module:464;464
+msgid "Syndicate content"
+msgstr "RSS-материал"
+
+#: site_map.module:470;470
+msgid "Syndicate comments"
+msgstr "Синдикация комментариев"
+
+#: site_map.module:25
+msgid "access site map"
+msgstr "доступ к карте сайта"
+
+#: site_map.module:0 site_map.info:0
+msgid "site_map"
+msgstr "site_map"
+
+#: site_map.info:0
+msgid "Display a site map."
+msgstr "Показывает настраиваемую карту сайта"
+

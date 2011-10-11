@@ -1,0 +1,474 @@
+<?php
+
+/*
+ * CKEditor - The text editor for the Internet - http://ckeditor.com
+ * Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+ *
+ * == BEGIN LICENSE ==
+ *
+ * Licensed under the terms of any of the following licenses at your
+ * choice:
+ *
+ *  - GNU General Public License Version 2 or later (the "GPL")
+ *    http://www.gnu.org/licenses/gpl.html
+ *
+ *  - GNU Lesser General Public License Version 2.1 or later (the "LGPL")
+ *    http://www.gnu.org/licenses/lgpl.html
+ *
+ *  - Mozilla Public License Version 1.1 or later (the "MPL")
+ *    http://www.mozilla.org/MPL/MPL-1.1.html
+ *
+ * == END LICENSE ==
+ *
+ * @file
+ * CKEditor Module for Drupal 7.x
+ *
+ * This module allows Drupal to replace textarea fields with CKEditor.
+ *
+ * This HTML text editor brings to the web many of the powerful functionalities
+ * of known desktop editors like Word. It's really  lightweight and doesn't
+ * require any kind of installation on the client computer.
+ */
+
+/*
+ * Implementation of hook_install().
+ *
+ * This will automatically install the database tables for the CKEditor module for both the MySQL and PostgreSQL databases.
+ *
+ * If you are using another database, you will have to install the tables by hand, using the queries below as a reference.
+ *
+ * Note that the curly braces around table names are a drupal-specific feature to allow for automatic database table prefixing,
+ * and will need to be removed.
+ */
+function ckeditor_install() {
+    module_load_include('inc', 'ckeditor', 'includes/ckeditor.lib');
+
+    //searching ckeditor.js
+    $editor_path = _ckeditor_script_path();
+    //insert default input formats to profiles
+    db_insert('ckeditor_input_format')->fields(array("name" => "Advanced", "format" => 'filtered_html'))->execute();
+    db_insert('ckeditor_input_format')->fields(array("name" => "Full", "format" => 'full_html'))->execute();
+
+    //insert settings for default role
+    $arr = array();
+    $arr['filebrowser'] = 'none';
+    $arr['quickupload'] = 'f';
+
+    //security
+    $arr['ss'] = "2";
+    $arr['filters']['filter_html'] = 1;
+
+    //appearance
+    $arr['default'] = "t";
+    $arr['show_toggle'] = "t";
+    $arr['popup'] = variable_get('ckeditor_popup', 0) ? "t" : "f";
+    $arr['skin'] = "kama";
+    $arr['toolbar'] = "
+[
+    ['Source'],
+    ['Cut','Copy','Paste','PasteText','PasteFromWord','-','SpellChecker', 'Scayt'],
+    ['Undo','Redo','Find','Replace','-','SelectAll','RemoveFormat'],
+    ['Image','Media','Flash','Table','HorizontalRule','Smiley','SpecialChar'],
+    ['Maximize', 'ShowBlocks'],
+    '/',
+    ['Format'],
+    ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
+    ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
+    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl'],
+    ['Link','Unlink','Anchor']
+]
+    ";
+    $arr['expand'] = variable_get('ckeditor_toolbar_start_expanded', 1) ? "t" : "f";
+    $arr['width'] = variable_get("ckeditor_width", "100%");
+    $arr['lang'] = "en";
+    $arr['auto_lang'] = "t";
+    $arr['language_direction'] = "default";
+
+    //output
+    $arr['enter_mode'] = "p";
+    $arr['shift_enter_mode'] = "br";
+    $arr['font_format'] = 'p;div;pre;address;h1;h2;h3;h4;h5;h6';
+    $arr['format_source'] = "t";
+    $arr['format_output'] = "t";
+    $arr['custom_formatting'] = "f";
+    $arr['formatting']['custom_formatting_options'] = array('indent' => 'indent', 'breakBeforeOpen' => 'breakBeforeOpen', 'breakAfterOpen' => 'breakAfterOpen', 'breakAfterClose' => 'breakAfterClose');
+
+    //css
+    $arr['css_mode'] = "none";
+    $arr['css_path'] = variable_get("ckeditor_stylesheet", "");
+
+    //upload
+    //get permissions here like in _update_role_permissions
+    $arr['filebrowser'] = "none";
+    $arr['user_choose'] = "f";
+    $arr['ckeditor_load_method'] = "ckeditor.js";
+    $arr['ckeditor_load_time_out'] = 0;
+    $arr['scayt_autoStartup'] = "f";
+
+    db_insert('ckeditor_settings')->fields(array("name" => "Advanced", "settings" => serialize($arr)))->execute();
+
+    //insert settings for advanced role
+    $arr['toolbar'] = "
+[
+    ['Source'],
+    ['Cut','Copy','Paste','PasteText','PasteFromWord','-','SpellChecker', 'Scayt'],
+    ['Undo','Redo','Find','Replace','-','SelectAll','RemoveFormat'],
+    ['Image','Media','Flash','Table','HorizontalRule','Smiley','SpecialChar'],
+    '/',
+    ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
+    ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
+    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl'],
+    ['Link','Unlink','Anchor'],
+    ['DrupalBreak'],
+    '/',
+    ['Format','Font','FontSize'],
+    ['TextColor','BGColor'],
+    ['Maximize', 'ShowBlocks']
+]
+    ";
+
+    $arr['filters'] = array();
+
+    db_insert('ckeditor_settings')->fields(array("name" => "Full", "settings" => serialize($arr)))->execute();
+
+    $arr = array();
+
+    if ($editor_path) {
+        $arr['ckeditor_path'] = $editor_path;
+    }
+
+    db_insert('ckeditor_settings')->fields(array("name" => "CKEditor Global Profile", "settings" => serialize($arr)))->execute();
+
+    module_load_include('inc', 'ckeditor', 'includes/ckeditor.admin');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function ckeditor_schema() {
+    $schema['ckeditor_settings'] = array(
+        'description' => 'Stores CKEditor profile settings',
+        'fields' => array(
+            'name' => array(
+                'type' => 'varchar',
+                'not null' => TRUE,
+                'default' => '',
+                'length' => 128,
+                'description' => 'Name of the CKEditor profile',
+            ),
+            'settings' => array(
+                'type' => 'text',
+                'description' => 'Profile settings',
+            ),
+        ),
+        'primary key' => array('name')
+    );
+    $schema['ckeditor_input_format'] = array(
+        'description' => 'Stores CKEditor input format assignments',
+        'fields' => array(
+            'name' => array(
+                'type' => 'varchar',
+                'not null' => TRUE,
+                'default' => '',
+                'length' => 128,
+                'description' => 'Name of the CKEditor role',
+            ),
+            'format' => array(
+                'type' => 'varchar',
+                'not null' => TRUE,
+                'default' => '',
+                'length' => 128,
+                'description' => 'Drupal filter format id',
+            )
+        ),
+        'primary key' => array('name', 'format'),
+    );
+
+    return $schema;
+}
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * This hook will issue warnings if:
+ * - The CKEditor source files are not found
+ * - The CKEditor source files are out of date
+ * - Quick upload and/or the built-in file browser are used and $cookie_domain is not set
+ */
+function ckeditor_requirements($phase) {
+    $requirements = array();
+
+    if ($phase == 'runtime') {
+        module_load_include('module', 'ckeditor');
+        module_load_include('inc', 'ckeditor', 'includes/ckeditor.lib');
+        $requirements['ckeditor'] = array(
+            'title' => t('CKEditor'),
+            'value' => t('Unknown'),
+        );
+
+        $requirements['ckeditor']['severity'] = REQUIREMENT_OK;
+
+        if (!_ckeditor_requirements_isinstalled()) {
+            $sourcepath = ckeditor_path(TRUE);
+
+            $requirements['ckeditor']['description'] = t('CKEditor was not found at %sourcepath', array('%sourcepath' => $sourcepath));
+            $requirements['ckeditor']['severity'] = REQUIREMENT_ERROR;
+        }
+        elseif (($installed_version = _ckeditor_requirements_getinstalledversion()) === NULL) {
+            $requirements['ckeditor']['description'] = t('CKEditor version could not be determined');
+            $requirements['ckeditor']['severity'] = REQUIREMENT_INFO;
+        }
+        else {
+            $profile_name = _ckeditor_requirements_ckfinder_filebrowser_enabled();
+            if ($profile_name !== FALSE) {
+                if (!_ckeditor_requirements_cookiedomainset()) {
+                    $requirements['ckeditor']['severity'] = REQUIREMENT_ERROR;
+                    $requirements['ckeditor']['description'] = t('You are using a feature that requires $cookie_domain to be set, but it is not set in your settings.php (CKFinder is enabled in the !profile profile).', array('!profile' => l($profile_name, 'admin/config/content/ckeditor/edit/' . urlencode($profile_name))));
+                }
+                elseif ($error = _ckeditor_requirements_ckfinder_config_check($profile_name)) {
+                    $requirements['ckeditor']['severity'] = REQUIREMENT_ERROR;
+                    $requirements['ckeditor']['description'] = $error;
+                }
+            }
+        }
+        if ((($installed_version = _ckeditor_requirements_getinstalledversion()) !== NULL) && (-1 == version_compare($installed_version, '3.1 SVN'))) {
+            $requirements['ckeditor']['description'] = t('Some features are disabled because you\'re using an older version of CKEditor, please upgrade the editor to CKEditor 3.1 (or higher).');
+            $requirements['ckeditor']['severity'] = REQUIREMENT_INFO;
+        }
+        if (!empty($installed_version)) {
+            $requirements['ckeditor']['value'] = $installed_version;
+        }
+    }
+
+    return $requirements;
+}
+
+/**
+ * Fetches the version of the installed CKEditor sources
+ *
+ * It tries to locate the version of the CKEditor sources in
+ * ckeditor.js
+ *
+ * Releases have a version number such as "3.0.1"
+ * SVN nightly releases have a minor version number with SVN appended: "3.0 SVN"
+ * SVN check outs have the string "[Development]"
+ *
+ * This function is used by ckeditor_requirements()
+ *
+ * @return string Version number (eg. 3.0) of CKEditor. Null if not found in ckeditor_basic.js
+ */
+function _ckeditor_requirements_getinstalledversion() {
+    module_load_include('module', 'ckeditor');
+    $editor_path = ckeditor_path(TRUE, TRUE);
+    $jspath = $editor_path . '/ckeditor_basic.js';
+
+    $configcontents = @file_get_contents($jspath);
+    if (!$configcontents) {
+        return NULL;
+    }
+    $matches = array();
+    if (preg_match('#,version:\'(.*?)\',#', $configcontents, $matches)) {
+        return $matches[1];
+    }
+    return NULL;
+}
+
+/**
+ * Executed when built-in file browser is enabled
+ * Returns FALSE if no errors are found in config.php file, otherwise it returns an error message.
+ *
+ * @return string|boolean
+ */
+function _ckeditor_requirements_ckfinder_config_check($profile_name) {
+    global $base_url;
+    module_load_include('module', 'ckeditor');
+    $module_drupal_path = drupal_get_path('module', 'ckeditor');
+    $config_path = $module_drupal_path . '/ckfinder/config.php';
+
+    if (!file_exists($config_path)) {
+        return t('!ckfinder is not installed correctly: !config not found. Make sure that you have uploaded all files or didn\'t remove that file accidentally.', array(
+            '!config' => $module_drupal_path . '/ckfinder/config.php',
+            '!ckfinder' => '<a href="http://ckfinder.com">CKFinder</a>'
+        ));
+    }
+
+    if (!is_readable($config_path)) {
+        return t('CKEditor needs read permission to !config.', array('!config' => 'ckfinder/config.php'));
+    }
+
+    $config_contents = file($config_path);
+
+    //not a 100% valid check, but well... let's have at least some error checking
+    $require_once_found = FALSE;
+    $require_once_line = 0;
+    $userfiles_absolute_path_line = 0;
+    $force_single_extension_line = 0;
+
+    if ($config_contents) {
+        foreach ($config_contents as $line_num => $line) {
+            //make sure it doesn't start with a comment, unfortunately we're not protected if code is commented with /* */
+            if (!$require_once_found && strpos($line, "filemanager.config.php") !== FALSE && !preg_match(",^(?://|\#|\*|/\*),", trim($line))) {
+                $require_once_found = TRUE;
+                $require_once_line = $line_num;
+            }
+            /**
+             * @todo Finish this
+             */
+            if (!$userfiles_absolute_path_line && strpos($line, '$Config[\'UserFilesAbsolutePath\']') !== FALSE && !preg_match(",^(?://|\#|\*|/\*),", trim($line))) {
+                $userfiles_absolute_path_line = $line_num;
+            }
+            if (!$force_single_extension_line && strpos($line, '$Config[\'ForceSingleExtension\']') !== FALSE && !preg_match(",^(?://|\#|\*|/\*),", trim($line))) {
+                $force_single_extension_line = $line_num;
+            }
+        }
+    }
+
+    if (!$require_once_found) {
+        return t('You are using a feature that requires manual integration into config.php. Please read the "Installing CKFinder" section in !readme carefully and add "require_once ..." statement in %ckfconfig.', array('%ckfconfig' => drupal_get_path('module', 'ckeditor') . '/ckfinder/config.php', '!readme' => l(t('README.txt'), $base_url . '/' . drupal_get_path('module', 'ckeditor') . '/README.txt', array('absolute' => TRUE))));
+    }
+
+    if ($userfiles_absolute_path_line && $force_single_extension_line && (
+            $require_once_line < $userfiles_absolute_path_line || $require_once_line > $force_single_extension_line)) {
+        return t('You are using a feature that requires manual integration into config.php. You have added "require_once ..." statement in %ckfconfig, but in the wrong line.', array('%ckfconfig' => drupal_get_path('module', 'ckeditor') . '/ckfinder/config.php'));
+    }
+
+    return FALSE;
+}
+
+/**
+ * Checks if any profile requires an explicit setting of $cookie_domain
+ * in settings.php
+ *
+ * %cookie_domain is required when the internal filebrowser or quick upload is used
+ *
+ * This function is used by ckeditor_requirements()
+ *
+ * @return boolean True if any profile requires $cookie_domain
+ */
+function _ckeditor_requirements_ckfinder_filebrowser_enabled() {
+    module_load_include('module', 'ckeditor');
+    $profiles = ckeditor_profile_load();
+
+    foreach ($profiles as $profile) {
+        if ((isset($profile->settings['filebrowser']) && $profile->settings['filebrowser'] == 'ckfinder')) {
+            return $profile->name;
+        }
+    }
+
+    return FALSE;
+}
+
+/**
+ * Checks if $cookie_domain has been set
+ *
+ * It has to include settings.php again because conf_init() sets
+ * $cookie_domain regardless of its presence in settings.php, so
+ * simply checking $GLOBALS['cookie_domain'] is not possible.
+ *
+ * This function is used by ckeditor_requirements()
+ *
+ * @return boolean True if $cookie_domain was set in settings.php
+ */
+function _ckeditor_requirements_cookiedomainset() {
+    if (file_exists('./' . conf_path() . '/settings.php')) {
+        $settings = file_get_contents('./' . conf_path() . '/settings.php');
+
+        if (preg_match('#^\s*\$cookie_domain#m', $settings)) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+/**
+ * Update broken settings for the 'Full' profile. (Reset toolbar to default)
+ */
+function ckeditor_update_7000() {
+    $result = db_query("SELECT settings FROM {ckeditor_settings} WHERE name = :name", array(':name' => 'Full'))->fetchField();
+    $settings = unserialize($result);
+    $settings['toolbar'] = "
+[
+    ['Source'],
+    ['Cut','Copy','Paste','PasteText','PasteFromWord','-','SpellChecker', 'Scayt'],
+    ['Undo','Redo','Find','Replace','-','SelectAll','RemoveFormat'],
+    ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar'],
+    '/',
+    ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
+    ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
+    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl'],
+    ['Link','Unlink','Anchor'],
+    ['DrupalBreak'],
+    '/',
+    ['Format','Font','FontSize'],
+    ['TextColor','BGColor'],
+    ['Maximize', 'ShowBlocks']
+]
+    ";
+
+    $settings = serialize($settings);
+
+    $update = db_update('ckeditor_settings')
+                    ->fields(array(
+                        'settings' => $settings,
+                    ))
+                    ->condition('name', 'Full', '=')
+                    ->execute();
+}
+
+/**
+ * Remove 'DrupalBreak' button from the 'Advanced' profile. (Reset toolbar to default)
+ */
+function ckeditor_update_7001() {
+    $result = db_query("SELECT settings FROM {ckeditor_settings} WHERE name = :name", array(':name' => 'Advanced'))->fetchField();
+    $settings = unserialize($result);
+    $settings['toolbar'] = "
+[
+    ['Source'],
+    ['Cut','Copy','Paste','PasteText','PasteFromWord','-','SpellChecker', 'Scayt'],
+    ['Undo','Redo','Find','Replace','-','SelectAll','RemoveFormat'],
+    ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar'],
+    ['Maximize', 'ShowBlocks'],
+    '/',
+    ['Format'],
+    ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
+    ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
+    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl'],
+    ['Link','Unlink','Anchor']
+]
+    ";
+
+    $settings = serialize($settings);
+
+    $update = db_update('ckeditor_settings')
+                    ->fields(array(
+                        'settings' => $settings,
+                    ))
+                    ->condition('name', 'Advanced', '=')
+                    ->execute();
+}
+
+/**
+ * Rewrite 'Path to CKEditor' to new flags
+ */
+function ckeditor_update_7002() {
+    $result = db_query("SELECT settings FROM {ckeditor_settings} WHERE name = :name", array(':name' => 'CKEditor Global Profile'))->fetchField();
+    $settings = unserialize($result);
+    if ($settings['ckeditor_path'] == '%b/sites/all/libraries/ckeditor'){
+        $settings['ckeditor_path'] = '%l/ckeditor';
+    }
+    else {
+        $settings['ckeditor_path'] = str_replace('%b/', '', $settings['ckeditor_path']);
+        $settings['ckeditor_path'] = str_replace('%b', '', $settings['ckeditor_path']);
+    }
+
+    $settings = serialize($settings);
+
+    $update = db_update('ckeditor_settings')
+                    ->fields(array(
+                        'settings' => $settings,
+                    ))
+                    ->condition('name', 'CKEditor Global Profile', '=')
+                    ->execute();
+
+}

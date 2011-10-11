@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * @file 
+ */
+
+/**
+ * Implementation of hook_uninstall() 
+ */
+function megamenu_uninstall() {
+  drupal_uninstall_schema('megamenu');
+}
+
+/**
+ * Implementation of hook_schema()
+ */
+function megamenu_schema() {
+  $schema['megamenu'] = array(
+    'description' => t('Stores the enabled state and other attributes of mega menus.'),
+    'fields' => array(
+      'menu_name' => array(
+        'description' => t('The name of a Drupal menu and corresponding mega menu'),
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'enabled' => array(
+        'description' => t('Enabled state of a mega menu: 1 = enabled, 0 = dissabled'),
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'size' => 'tiny',
+        'default' => '0',
+      ),
+      'skin' => array(
+        'description' => t('Name of skin (CSS class)'),
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+        'default' => 'friendly',
+      ),
+      'menu_orientation' => array(
+        'description' => t('Orientation of the entire menu (horizontal or vertical)'),
+        'type' => 'varchar',
+        'length' => '12',
+        'not null' => TRUE,
+        'default' => 'horizontal',
+      ),
+      'slot_orientation' => array(
+        'description' => t('Orientation CSS class to apply to slots (stacking or columnar)'),
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+        'default' => 'columnar',
+      ),
+      'slot_attributes' => array(
+        'description' => t('Custom CSS classes to apply to slots'),
+        'type' => 'text',
+        'size' => 'small',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('menu_name'),
+  );
+
+  return $schema;
+}

@@ -1,0 +1,200 @@
+
+Note: the HTML version of this file (always up-to-date) is available online: http://drupal.ckeditor.com/troubleshooting
+
+CONTENTS OF THIS FILE
+---------------------
+
+ * CKEditor doesn't work in xxx theme
+ * Known module incompatibilities
+ * Images aren't shown when submitted
+ * I followed the instruction, but CKEditor doesn't show up (+ debugging instructions)
+ * Selected toolbar does not show for user 1
+ * The CKEditor component is not installed correctly
+ * CKEditor doesn't work after upgrading
+ * Text alignment doesn't work
+ * Line breaks removed when editing content previously authored without using CKEditor
+ * I successfully uploaded an image, but cannot see it in the file browser
+ * Quote symbols being changed to quote entities
+
+CKEditor doesn't work in xxx theme
+----------------------------------------------------
+
+Your theme may be missing:
+
+<?php print $scripts; ?>
+
+Add that line of code in the head section of your theme.
+The other possibility may be that:
+
+<?php print $closure; ?>
+
+is missing in your theme (solution similar as above, add that line of code to your theme at the end).
+You can also use a different theme.
+
+Known module incompatibilities
+------------------------------
+
+At this moment, CKEditor will not show up, when the following modules are enabled:
+
+    * Theme developer (http://drupal.org/node/318941)
+    * Theme Builder (http://drupal.org/node/271032)
+
+Images aren't shown when submitted
+-------------------------------------------
+
+You probably must configure properly the input format. Either set it to Full HTML or add <img> tag to Filtered HTML. 
+The full list of tags, which should be allowed, is available in README.txt file.
+Make sure that you have read "Setting up filters" in README.txt or this page: http://drupal.ckeditor.com/filters
+
+I followed the instruction, but CKEditor doesn't show up
+--------------------------------------------------------------------------
+
+First of all make sure, that CKEditor is enabled on this specific page. 
+Take a look into source code of your page and search for something similar to:
+  "ckeditor": { "module_path":
+
+If you can't find similar code, then it means that CKEditor is disabled on that page/field. 
+Make sure that you have the right permissions to use CKEditor and check your CKEditor profile (include/exclude settings, minimum rows value).
+
+If CKEditor is enabled, but it doesn't show up, try the following steps:
+
+   1. Switch to default theme (Garland), if CKEditor appears, read the "CKEditor don't work in xxx theme" instructions. 
+      If your theme already has "closure" and "scripts" statements, read below.
+   2. Make sure that you're using browser compatible with CKEditor.
+   3. On some occasions, other installed modules may cause that CKEditor will not show up (although if you look at page source, you'll see CKEditor code).
+      Instead of CKEditor you may see a very small textarea. 
+      This mostly happens, when some other module cause a javascript error and CKEditor can't load because of this. 
+      To check this:
+       - write down the list of currently installed modules
+       - disable all additional modules
+       - if CKEditor showed up, start enabling all those modules that you disabled in previous step and find out which module is incompatible with CKEditor.
+         Use the project's site to report a new bug, provide the following details: 
+           * Drupal version
+           * CKEditor module version
+           * CKEditor version
+           * the name and version of incompatible module. 
+           * if additional steps are required to reproduce this issue, like creating a new special content or configuring this additional module in a special way, then provide a detailed list of steps to follow.
+       - if the step above didn't help, disable all additional modules and switch to Garland theme, clear browser's cache. 
+         If CKEditor still doesn't work then it means that it may be corrupted. 
+         Reupload CKEditor using a FTP client that warns you when files are truncated or corrupted.
+       - if CKEditor is working only in Garland theme with all modules enabled, but it doesn't work in your theme with all modules disabled, then your theme is a problem. 
+         Use the project's site to report a new bug, provide the following details: 
+            * Drupal version
+            * CKEditor module version
+            * CKEditor version
+            * the name and version of incompatible theme.
+   4. Finally, if nothing helped, to find out where exactly error occured, you may use Firefox with Firebug extension. 
+      Use the project's site to create a new support request providing as much information as possible, including the exact javascript error message that you got.
+
+Selected toolbar does not show for user 1
+-----------------------------------------
+
+There are two reasons why you're seeing a different toolbar (or don't see CKEditor at all):
+
+ - If "Allow users to customize CKEditor appearance" is enabled then each
+  user may override the profile settings in "Rich text editor settings" in admin/user/N/edit 
+  ("My Account" -> "Edit")
+
+ - A different profile is used for user 1 that you expect.
+  User 1 must be assigned a system role that corresponds to the privileges required.
+  If no role is assigned to User 1, they will have the privileges of "authenticated user" 
+  (usually it is the "Advanced" profile).
+
+The CKEditor component is not installed correctly
+---------------------------------------------------------------------------
+
+Please remember that installing CKEditor module is a two step process. You have to download and unpack:
+CKEditor module, that integrates the CKEditor with Drupal
+CKEditor, the HTML editor
+
+If your CKEditor does not show you must check if all files are extracted correctly. 
+The directory /modules/ckeditor/ckeditor/ should have the following files:
+ckeditor.js, config.js, contents.css and directories named "skins", "themes", "lang", "images"
+
+The correct directory structure is as follows:
+modules               <dir>
+   ckeditor           <dir>
+      ckeditor.module
+      ckeditor.admin.inc
+      ...
+      ckeditor        <dir>
+         _source      <dir>
+         images       <dir>
+         lang         <dir>
+         plugins      <dir>
+         skins        <dir>
+         themes       <dir>
+         COPY_HERE.txt
+         ckeditor.js
+         ...
+
+CKEditor doesn't work after upgrading
+-----------------------------------------------
+
+This may be caused by the browser's cache. Clear your browser's cache, restart the browser if it didn't help.
+If you upgraded CKEditor module, make sure that all roles with "access ckeditor" permissions are assigned to at least one CKEditor profile.
+
+Text alignment doesn't work
+------------------------------------
+
+In ckeditor.config.js (located in ckeditor module directory), the following classes are defined to provide text alignment functionality:
+config.justifyClasses = [ 'rteleft', 'rtecenter', 'rteright', 'rtejustify' ];
+
+Unfortunately, some themes may override those styles and text alignment may not work as expected.
+If you're using Full HTML input format, you may simply comment out this line:
+//config.justifyClasses = [ 'rteleft', 'rtecenter', 'rteright', 'rtejustify' ];
+
+and CKEditor will use inline styles instead: <p style="text-align: right;">sample text</p>. 
+The problem is that inline styles may be used only with Full HTML. 
+Filtered HTML will strip that code, so don't use this solution with Filtered HTML input format. 
+
+For Filtered HTML things are a bit more complicated. For example if your theme defines such CSS style:
+
+.content p {  text-align: left; }
+
+text-align property set in .rteright class will not work. 
+To align <p> tag, you will have to edit modules/ckeditor/ckeditor.css file and create a style, that will be applied to <p> tag:
+
+.content p.rteleft {
+  text-align: left;
+}
+.content p.rteright {
+  text-align: right;
+}
+.content p.rtecenter {
+  text-align: center;
+}
+.content p.rtejustify {
+  text-align: justify;
+}
+
+Use DOM inspector (in Firefox) to check why alignment doesn't work and to correct CSS styles. 
+There is no universal workaround for this.
+
+Line breaks removed when editing content previously authored without using CKEditor
+---------------------------------------------------------------------------------------------
+
+The problems is in the way how did you configure your input filters. 
+Before you enabled CKEditor, you probably had Line break converter enabled.
+
+Now you're trying to edit the same content with Line break converter disabled, thus your linebreaks are removed.
+
+Possible workarounds:
+ * Enable Line break converter (not recommended).
+ * Create new input format with Line break converter enabled. Use it just for old articles (recommended).
+ * Start with CKEditor disabled by default, replace all new line characters manually with <br> tag, then use toggle to switch to WYSIWYG mode.
+
+ If you're a PHP programmer, you may try the approach proposed by BakerQ in drupal.org/node/240633
+
+Quote symbols being changed to quote entities
+------------------------------------------------------
+
+Some modules like Typogrify or SmartyPants require special handling of HTML entities. 
+For example, by default, CKEditor will convert double quote (") to &quot;. 
+To disable processing HTML entities, add the following line to modules/ckeditor/ckeditor.config.js:
+
+config.entities = false;
+
+It is also possible to disable processing HTML entities for selected CKEditor profile, by adding this line in "Advanced Options" -> "Custom javascript configuration":
+
+entities = false;

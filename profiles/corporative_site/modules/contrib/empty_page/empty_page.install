@@ -1,0 +1,78 @@
+<?php
+
+/**
+ *
+ * @file
+ * Installation file.
+ *
+ */
+
+/**
+ * Implements hook_install().
+ */
+function empty_page_install() {
+  // When menu items are being retrieved, Empty Page's hook_menu needs to come last so that path overrides work.
+  db_update('system')
+    ->fields(array('weight' => 1000))
+    ->condition('name', 'empty_page')
+    ->execute();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function empty_page_uninstall() {
+  empty_page_clear_menu_cache();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function empty_page_schema() {
+  $schema['empty_page'] = array(
+    'description' => 'The base table for empty_page callbacks.',
+    'fields' => array(
+      'cid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'page_title' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'data' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+      ),
+      'changed' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'changed' => array('changed'),
+    ),
+    'unique keys' => array(
+      'cid' => array('cid')
+    ),
+    'primary key' => array('cid'),
+  );
+
+  return $schema;
+}

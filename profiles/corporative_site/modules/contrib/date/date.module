@@ -1,0 +1,791 @@
+<?php
+
+/**
+ * @file
+ * Defines date/time field types for the Content Construction Kit (CCK).
+ */
+
+module_load_include('theme', 'date', 'date');
+module_load_include('inc', 'date', '/date.field');
+module_load_include('inc', 'date', '/date_elements');
+
+/**
+ * Implements hook_menu().
+ *
+ * Add menu tabs to display pages with details about repeating date values.
+ */
+function date_menu() {
+  $items = array();
+  // Repeat dates tab on entity
+  if (!module_exists('date_repeat')) {
+    return $items;
+  }
+
+  $values = date_repeat_bundles();
+  foreach ($values as $entity_type => $bundles) {
+    if (module_exists('field_collection') && $entity_type == 'field_collection_item') {
+      foreach ($bundles as $bundle => $fields) {
+        $field = field_info_field($bundle);
+        if ($field['type'] == 'field_collection') {
+          $path = field_collection_field_get_path($field);
+          $count = count(explode('/', $path));
+          $items[$path . '/%field_collection_item/repeats'] = array(
+           'title' => 'Repeats',
+           'page callback' => 'date_repeat_page',
+           'page arguments' => array($entity_type, $count),
+           'access callback' => 'date_repeat_show',
+           'access arguments' => array($entity_type, $count),
+           'type' => MENU_LOCAL_TASK,
+           'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+          );
+        }
+      }
+    }
+    else {
+      $path = $entity_type . '/%' . $entity_type;
+      $items[$path . '/repeats'] = array(
+       'title' => 'Repeats',
+       'page callback' => 'date_repeat_page',
+       'page arguments' => array($entity_type, 1),
+       'access callback' => 'date_repeat_show',
+       'access arguments' => array($entity_type, 1),
+       'type' => MENU_LOCAL_TASK,
+       'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+      );
+    }
+  }
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function date_permission() {
+  return array('view date repeats' => array(
+    'title' => t('View Repeating Dates'),
+    'description' => t('Allow user to see a page with all the times a date repeats.'),
+  ));
+}
+
+/**
+ * See if the user can access repeat date info for this field.
+ */
+function date_repeat_show($entity_type = 'node', $entity = NULL) {
+  $bundle = date_get_entity_bundle($entity_type, $entity);
+  $fields = field_info_instances($entity_type, $bundle);
+  foreach ($fields as $field_name => $data) {
+    $field = field_info_field($field_name);
+    if (in_array($field['type'], array('date', 'datestamp', 'datetime'))) {
+      return user_access('view date repeats');
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * A page to list all values for a repeating date.
+ */
+function date_repeat_page($entity_type = 'node', $entity = NULL) {
+  $bundle = date_get_entity_bundle($entity_type, $entity);
+  $info = entity_get_info($entity_type);
+  $key = $info['entity keys']['id'];
+  drupal_set_title(t('Repeats'));
+  $entity->date_repeat_show_all = TRUE;
+  $entity->content = array();
+  $output = '';
+  $fields = field_info_instances($entity_type, $bundle);
+  foreach ($fields as $field_name => $data) {
+    $field = field_info_field($field_name);
+    if (in_array($field['type'], array('date', 'datestamp', 'datetime'))) {
+      $field = field_view_field($entity_type, $entity, $field_name, 'full');
+      $output .= drupal_render($field);
+    }
+  }
+  return $output;
+}
+
+/**
+ * Return an array of all entity types and bundles that have repeating date fields.
+ */
+function date_repeat_bundles() {
+  $values = array();
+  $items = field_info_instances();
+  foreach ($items as $entity_type => $bundles) {
+    foreach ($bundles as $bundle => $widgets) {
+      foreach ($widgets as $field_name => $widget) {
+        $field = field_info_field($field_name);
+        if (in_array($field['type'], array('date', 'datestamp', 'datetime')) && $field['settings']['repeat']) {
+          $values[$entity_type][$bundle][] = $field_name;
+        }
+      }
+    }
+  }
+  return $values;
+}
+
+/**
+ * Helper function to figure out the bundle name for an entity.
+ */
+function date_get_entity_bundle($entity_type, $entity) {
+  switch ($entity_type) {
+    case 'field_collection_item':
+      $bundle = $entity->field_name;
+      break;
+    default:
+      $bundle = field_extract_bundle($entity_type, $entity);
+      break;
+  }
+  // If there is no bundle name, field_info() uses the entity name as the bundle name in its arrays.
+  if (empty($bundle)) {
+    $bundle = $entity_type;
+  }
+  return $bundle;
+}
+
+function date_is_repeat_field($field, $instance = NULL) {
+  if (is_string($field)) {
+    $field = field_info_field($field);
+  }
+  
+  $value = $field['settings']['repeat'];
+
+  // This might be either a field form or a real field.
+  if (is_array($value)) {
+    return $value['#value'];
+  }
+  else {
+    return $value;
+  }
+}
+
+function date_default_format($type) {
+  if (stristr($type, 'date_popup') && module_exists('date_popup')) {
+    $formats = date_popup_formats();
+    $default_format = array_shift($formats);
+  }
+  else {
+    // example input formats must show all possible date parts, so add seconds.
+    $default_format = str_replace('i', 'i:s', variable_get('date_format_short', 'm/d/Y - H:i'));
+  }
+  return $default_format;
+}
+
+function date_input_date($field, $instance, $element, $input) {
+  switch ($instance['widget']['type']) {
+    case 'date_text':
+      $function = 'date_text_input_date';
+      break;
+    case 'date_popup':
+      $function = 'date_popup_input_date';
+      break;
+    default:
+      $function = 'date_select_input_date';
+  }
+  return $function($element, $input);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function date_theme() {
+  $path = drupal_get_path('module', 'date');
+  module_load_include('theme', 'date', 'date');
+
+  $base = array(
+    'file' => 'date.theme',
+    'path' => "$path",
+  );
+  $themes = array(
+    'date_combo' => $base + array('render element' => 'element'),
+    'date_text_parts' => $base + array('render element' => 'element'),
+    'date' => $base + array('render element' => 'element'),
+    'date_all_day' => $base + array(
+      'variables' => array(
+        'field' => NULL,
+        'instance' => NULL,
+        'which' => NULL,
+        'date1' => NULL,
+        'date2' => NULL,
+        'format' => NULL,
+        'entity_type' => NULL,
+        'entity' => NULL,
+        'view' => NULL
+      )
+    ),
+    'date_all_day_label' => $base + array('variables' => array()),
+    'date_display_single' => $base + array('variables' => array(
+        'date' => NULL,
+        'timezone' => NULL,
+        'dates' => NULL,
+        'attributes' => array(),
+        'rdf_mapping' => NULL,
+        'add_rdf' => NULL,
+    )),
+    'date_display_range' => $base + array(
+      'variables' => array(
+        'date1' => NULL,
+        'date2' => NULL,
+        'timezone' => NULL,
+        'dates' => NULL,
+        // HTML attributes that will be applied to both the start and end dates
+        // (unless overridden).
+        'attributes' => array(),
+        // HTML attributes that will be applied to the start date only.
+        'attributes_start' => array(),
+        // HTML attributes that will be applied to the end date only.
+        'attributes_end' => array(),
+        'rdf_mapping' => NULL,
+        'add_rdf' => NULL,
+    )),
+    'date_repeat_display' => $base + array(
+      'variables' => array(
+        'field' => NULL,
+        'item' => NULL,
+        'entity_type' => NULL,
+        'entity' => NULL,
+        'dates' => NULL
+      ),
+      'function' => 'theme_date_repeat_display',
+    ),
+    'date_display_combination' => $base + array(
+      'variables' => array(
+        'entity_type' => NULL,
+        'entity' => NULL,
+        'field' => NULL,
+        'instance' => NULL,
+        'langcode' => NULL,
+        'item' => NULL,
+        'delta' => NULL,
+        'display' => NULL,
+        'dates' => NULL,
+        'attributes' => array(),
+        'rdf_mapping' => NULL,
+        'add_rdf' => NULL,
+      ),
+    ),
+    'date_display_interval' => $base + array(
+      'variables' => array(
+        'entity_type' => NULL,
+        'entity' => NULL,
+        'field' => NULL,
+        'instance' => NULL,
+        'langcode' => NULL,
+        'item' => NULL,
+        'delta' => NULL,
+        'display' => NULL,
+        'dates' => NULL,
+        'attributes' => array(),
+        'rdf_mapping' => NULL,
+        'add_rdf' => NULL,
+       ),
+    ),
+  );
+
+  return $themes;
+}
+
+/**
+ * Implements hook_element_info().
+ *
+ * date_combo will create a 'start' and optional 'end' date, along with
+ * an optional 'timezone' column for date-specific timezones. Each
+ * 'start' and 'end' date will be constructed from date_select or date_text.
+ */
+function date_element_info() {
+  $type = array();
+  $type['date_combo'] = array(
+    '#input' => TRUE,
+    '#delta' => 0,
+    '#columns' => array('value', 'value2', 'timezone', 'offset', 'offset2'),
+    '#process' => array('date_combo_element_process'),
+    '#element_validate' => array('date_combo_validate'),
+    '#value_callback' => 'date_combo_value_callback',
+    '#theme_wrappers' => array('date_combo'),
+  );
+  if (module_exists('ctools')) {
+    $type['date_combo']['#pre_render'] = array('ctools_dependent_pre_render');
+  }
+  return $type;
+}
+
+/**
+ * Helper function for creating formatted date arrays from a formatter.
+ *
+ * Use the Date API to get an object representation of a date field
+ *
+ * @param array $field
+ * @param array $item - a entity field item, like $entity->myfield[0]
+ *
+ * @return array that holds the Start and End date objects
+ *  Each date object looks like:
+ *       date [value] => array (
+ *         [db] => array (  // the value stored in the database
+ *           [object] => the datetime object
+ *           [datetime] => 2007-02-15 20:00:00
+ *         )
+ *         [local] => array (  // the local representation of that value
+ *           [object] => the datetime object
+ *           [datetime] => 2007-02-15 14:00:00
+ *           [timezone] => US/Central
+ *           [offset] => -21600
+ *         )
+ *      )
+ */
+function date_formatter_process($formatter, $entity_type, $entity, $field, $instance, $langcode, $item, $display) {
+  $dates = array();
+  $timezone = date_default_timezone();    
+  if (empty($timezone)) {
+    return $dates;
+  }
+
+  $granularity = date_granularity($field);
+  $settings = $display['settings'];
+  $field_name = $field['field_name'];
+  $format = date_formatter_format($formatter, $settings, $granularity, $langcode);
+  $timezone = isset($item['timezone']) ? $item['timezone'] : '';
+  $timezone = date_get_timezone($field['settings']['tz_handling'], $timezone);
+  $timezone_db = date_get_timezone_db($field['settings']['tz_handling']);
+  $process = date_process_values($field);
+  foreach ($process as $processed) {
+    if (empty($item[$processed])) {
+      $dates[$processed] = NULL;
+    }
+    else {
+      // create a date object with a gmt timezone from the database value
+      $value = $item[$processed];
+      $db_format = date_type_format($field['type']);
+      $date = new DateObject($value, $timezone_db, $db_format);
+      $date->limitGranularity($field['settings']['granularity']);
+
+      $dates[$processed] = array();
+      $dates[$processed]['db']['object'] = $date;
+      $dates[$processed]['db']['datetime'] = date_format($date, DATE_FORMAT_DATETIME);
+
+      date_timezone_set($date, timezone_open($timezone));
+      $dates[$processed]['local']['object'] = $date;
+      $dates[$processed]['local']['datetime'] = date_format($date, DATE_FORMAT_DATETIME);
+      $dates[$processed]['local']['timezone'] = $timezone;
+      $dates[$processed]['local']['offset'] = date_offset_get($date);
+
+      //format the date, special casing the 'interval' format which doesn't need to be processed
+      $dates[$processed]['formatted'] = '';
+      $dates[$processed]['formatted_iso'] = date_format_date($date, 'custom', 'c');
+      if (is_object($date)) {
+        if ($format == 'format_interval') {
+           $dates[$processed]['interval'] = date_format_interval($date);
+        }
+        elseif ($format == 'format_calendar_day') {
+           $dates[$processed]['calendar_day'] = date_format_calendar_day($date);
+        }
+        elseif ($format == 'U') {
+          $dates[$processed]['formatted'] = date_format_date($date, 'custom', $format);
+          $dates[$processed]['formatted_date'] = date_format_date($date, 'custom', $format);
+          $dates[$processed]['formatted_time'] = '';
+          $dates[$processed]['formatted_timezone'] = '';
+        }
+        elseif (!empty($format)) {
+          $dates[$processed]['formatted'] = date_format_date($date, 'custom', $format);
+          $dates[$processed]['formatted_date'] = date_format_date($date, 'custom', date_limit_format($format, array('year', 'month', 'day')));
+          $dates[$processed]['formatted_time'] = date_format_date($date, 'custom', date_limit_format($format, array('hour', 'minute', 'second')));
+          $dates[$processed]['formatted_timezone'] = date_format_date($date, 'custom', date_limit_format($format, array('timezone')));
+        }
+      }
+    }
+  }
+  if (empty($dates['value2'])) {
+    $dates['value2'] = $dates['value'];
+  }
+  $date1 = $dates['value']['local']['object'];
+  $date2 = $dates['value2']['local']['object'];
+
+  $all_day = '';
+  $all_day2 = '';
+  if ($format != 'format_interval') {
+    $all_day1 = theme('date_all_day', array(
+      'field' => $field,
+      'instance' => $instance,
+      'which' => 'date1',
+      'date1' => $date1,
+      'date2' => $date2,
+      'format' => $format,
+      'entity_type' => $entity_type,
+      'entity' => $entity));
+    $all_day2 = theme('date_all_day', array(
+      'field' => $field,
+      'instance' => $instance,
+      'which' => 'date2',
+      'date1' => $date1,
+      'date2' => $date2,
+      'format' => $format,
+      'entity_type' => $entity_type,
+      'entity' => $entity));
+  }
+  if ((!empty($all_day1) && $all_day1 != $dates['value']['formatted'])
+  || (!empty($all_day2) && $all_day2 != $dates['value2']['formatted'])) {
+    $dates['value']['formatted_time'] = theme('date_all_day_label');
+    $dates['value2']['formatted_time'] = theme('date_all_day_label');
+    $dates['value']['formatted'] = $all_day1;
+    $dates['value2']['formatted'] = $all_day2;
+  }
+  $dates['format'] = $format;
+  return $dates;
+}
+
+/**
+ * $field['settings']['granularity'] will contain an array like ('hour' => 'hour', 'month' => 0)
+ * where the values turned on return their own names and the values turned off return a zero
+ * need to reconfigure this into a simple array of the turned on values
+ */
+function date_granularity($field) {
+  if (!is_array($field) || !is_array($field['settings']['granularity'])) {
+    $field['settings']['granularity'] = drupal_map_assoc(array('year', 'month', 'day'));
+  }
+  return array_values(array_filter($field['settings']['granularity']));
+}
+
+/**
+ * Helper function to create an array of the date values in a
+ * field that need to be processed.
+ */
+function date_process_values($field) {
+  return $field['settings']['todate'] ? array('value', 'value2') : array('value');
+}
+
+/**
+ * Implement hook_help().
+ */
+function date_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#date':
+      return '<p>' . t('Complete documentation for the Date and Date API modules is available at <a href="@link">http://drupal.org/node/92460</a>.', array('@link' => 'http://drupal.org/node/92460')) . '</p>';
+      break;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function date_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
+  $field = $form['#field'];
+  $instance = $form['#instance'];
+ 
+  if (!in_array($field['type'], array('date', 'datetime', 'datestamp'))) {
+    return;
+  }
+
+  // If using repeating dates, override the Field module's handling of the multiple values option.
+  if (module_exists('date_repeat') && date_is_repeat_field($field, $instance)) {
+    $form['field']['cardinality']['#disabled'] = TRUE;
+    $form['field']['cardinality']['#value'] = FIELD_CARDINALITY_UNLIMITED;
+  }
+
+  // Reorganize the instance settings and widget settings sections into a more
+  // intuitive combined fieldset.
+  $form['instance']['defaults'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('More settings and values'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['instance']['date_format'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Date entry'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['instance']['default_values'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Default values'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['instance']['years_back_and_forward'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Starting and ending year'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['instance']['#pre_render'][] = 'date_field_ui_field_edit_form_pre_render';
+}
+
+/**
+ * Rearrange form elements into fieldsets for presentation only.
+ */
+function date_field_ui_field_edit_form_pre_render($form) {
+  foreach ($form as $name => $element) {
+    if (is_array($element) && isset($element['#fieldset'])) {
+      $fieldset = $element['#fieldset'];
+      $form[$fieldset][$name] = $element;
+      unset($form[$name]);
+    }
+  }
+  foreach (array('date_format', 'default_values', 'years_back_and_forward') as $name) {
+    if (element_children($form[$name])) {
+      // Force the items in the fieldset to be resorted now that the instance
+      // and widget settings are combined.
+      $form[$name]['#sorted'] = FALSE;
+      $form['defaults'][$name] = $form[$name];
+    }
+    unset($form[$name]);
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function date_field_widget_error($element, $error, $form, &$form_state) {
+  form_error($element[$error['error']], $error['message']);
+}
+
+/**
+ * Retrieve a date format string from formatter settings.
+ */
+function date_formatter_format($formatter, $settings, $granularity = NULL, $langcode = NULL) {
+  $format_type = !empty($settings['format_type']) ? $settings['format_type'] : 'format_interval';
+
+  switch ($formatter) {
+    case 'format_interval':
+      return 'format_interval';
+      break;
+    default:
+      $format = system_date_format_locale($langcode, $format_type);
+      if (empty($format)) {
+        // If the configuration page at admin/config/regional/date-time was
+        // never saved, the default core date format variables
+        // ('date_format_short', 'date_format_medium', and 'date_format_long')
+        // will not be stored in the database, so we have to define their
+        // expected defaults here.
+        switch ($format_type) {
+          case 'short':
+            $default = 'm/d/Y - H:i';
+            break;
+          case 'long':
+            $default = 'l, F j, Y - H:i';
+            break;
+          // If it's not one of the core date types and isn't stored in the
+          // database, we'll fall back on using the same default format as the
+          // 'medium' type.
+          case 'medium':
+          default:
+            // @todo: If a non-core module provides a date type and does not
+            //   variable_set() a default for it, the default assumed here may
+            //   not be correct (since the default format used by 'medium' may
+            //   not even be one of the allowed formats for the date type in
+            //   question). To fix this properly, we should really call
+            //   system_get_date_formats($format_type) and take the first
+            //   format from that list as the default. However, this function
+            //   is called often (on many different page requests), so calling
+            //   system_get_date_formats() from here would be a performance hit
+            //   since that function writes several records to the database
+            //   during each page request that calls it.
+            $default = 'D, m/d/Y - H:i';
+            break;
+        }
+        $format = variable_get('date_format_'. $format_type, $default);
+      }      
+      break; 
+  }
+
+  // A selected format might include timezone information.
+  array_push($granularity, 'timezone');
+  return date_limit_format($format, $granularity);
+}
+
+/**
+ * Helper function to adapt entity date fields to formatter settings.
+ */
+function date_prepare_entity($formatter, $entity_type, $entity, $field, $instance, $langcode, $item, $display) {
+
+  // If there are options to limit multiple values,
+  // alter the entity values to match.
+  $field_name = $field['field_name'];
+  $options = $display['settings'];
+  $max_count = $options['multiple_number'];
+
+  // If no results should be shown, empty the values and return.
+  if (is_numeric($max_count) && $max_count == 0) {
+    $entity->{$field_name} = array();
+    return $entity;
+  }
+
+  // Otherwise removed values that should not be displayed.
+  if (!empty($options['multiple_from']) || !empty($options['multiple_to']) || !empty($max_count)) {
+    $format = date_type_format($field['type']);
+    include_once(drupal_get_path('module', 'date_api') . '/date_api_sql.inc');
+    $date_handler = new date_sql_handler($field);
+    $arg0 = !empty($options['multiple_from']) ? $date_handler->arg_replace($options['multiple_from']) : variable_get('date_min_year', 100) . '-01-01T00:00:00';
+    $arg1 = !empty($options['multiple_to']) ? $date_handler->arg_replace($options['multiple_to']) : variable_get('date_max_year', 4000) . '-12-31T23:59:59';
+    if (!empty($arg0) && !empty($arg1)) {
+      $arg = $arg0 . '--' . $arg1;
+    }
+    elseif (!empty($arg0)) {
+      $arg = $arg0;
+    }
+    elseif (!empty($arg1)) {
+      $arg = $arg1;
+    }
+    if (!empty($arg)) {
+      $range = $date_handler->arg_range($arg);
+      $start = date_format($range[0], $format);
+      $end = date_format($range[1], $format);
+      // Empty out values we don't want to see.
+      $count = 0;
+      foreach ($entity->{$field_name}[$langcode] as $delta => $value) {
+        if (!empty($entity->date_repeat_show_all)) {
+          break;
+        }
+        elseif ((!empty($max_count) && is_numeric($max_count) && $count >= $max_count) ||
+          (!empty($value['value'])  && $value['value'] < $start) ||
+          (!empty($value['value2']) && $value['value2'] > $end)) {
+            unset($entity->{$field_name}[$langcode][$delta]);
+        }
+        else {
+          $count++;
+        }  
+      }
+    }
+  }
+
+  return $entity;
+}
+
+/**
+ * Generate a DateAPI SQL handler for the given CCK date field.
+ *
+ * The handler will be set up to make the correct timezone adjustments
+ * for the field settings.
+ *
+ * @param $field
+ *  - a $field array.
+ * @param $compare_tz
+ *  - the timezone used for comparison values in the SQL.
+ */
+ function date_field_get_sql_handler($field, $compare_tz = NULL) {
+   module_load_include('inc', 'date_api', 'date_api_sql');
+
+   $db_info = date_api_database_info($field);
+
+   // Create a DateAPI SQL handler class for this field type.
+   $handler = new date_sql_handler($field['type']);
+
+   // If this date field stores a timezone in the DB, tell the handler about it.
+   if ($field['settings']['tz_handling'] == 'date') {
+     $handler->db_timezone_field = $db_info['columns']['timezone']['column'];
+   }
+   else {
+     $handler->db_timezone = date_get_timezone_db($field['settings']['tz_handling']);
+   }
+
+   if (empty($compare_tz)) {
+     $compare_tz = date_get_timezone($field['settings']['tz_handling']);
+   }
+   $handler->local_timezone = $compare_tz;
+
+  // Now that the handler is properly initialized, force the DB
+  // to use UTC so no timezone conversions get added to things like
+  // NOW() or FROM_UNIXTIME().
+  $handler->set_db_timezone();
+
+  return $handler;
+}
+
+/**
+ * Callback to alter the property info of date fields.
+ *
+ * @see date_field_info()
+ */
+function date_entity_metadata_property_info_alter(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = $field['field_name'];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+  if ($field['type'] != 'datestamp' || $field['settings']['timezone_db'] != 'UTC') {
+    // Add a getter callback to convert the date into the right format.
+    $property['getter callback'] = 'date_entity_metadata_field_getter';
+    unset($property['query callback']);
+    unset($property['setter callback']);
+  }
+  if (!empty($field['settings']['todate'])) {
+    // Define a simple data structure containing both dates.
+    $property['type'] = ($field['cardinality'] != 1) ? 'list<struct>' : 'struct';
+    $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+    $property['property info'] = array(
+      'value' => array(
+        'type' => 'date',
+        'label' => t('Start date'),
+        'getter callback' => 'date_entity_metadata_struct_getter',
+      ),
+      'value2' => array(
+        'type' => 'date',
+        'label' => t('End date'),
+        'getter callback' => 'date_entity_metadata_struct_getter',
+      ),
+      'duration' => array(
+        'type' => 'duration',
+        'label' => t('Duration'),
+        'desription' => t('The duration of the time period given by the dates.'),
+        'getter callback' => 'date_entity_metadata_duration_getter',
+      ),
+    );
+    unset($property['query callback']);
+    unset($property['setter callback']);
+  }
+}
+
+/**
+ * Getter callback to return date values as datestamp in UTC from the field.
+ */
+function date_entity_metadata_field_getter($object, array $options, $name, $obj_type, &$context) {
+  $return = entity_metadata_field_verbatim_get($object, $options, $name, $obj_type, $context);
+  $items = ($context['field']['cardinality'] == 1) ? array($return) : $return;
+  foreach ($items as $key => $item) {
+    $items[$key] = date_entity_metadata_struct_getter($item, $options, 'value', 'struct');
+  }
+  return ($context['field']['cardinality'] == 1) ? $items[0] : $items;
+}
+
+/**
+ * Getter callback to return date values as datestamp in UTC.
+ */
+function date_entity_metadata_struct_getter($item, array $options, $name, $type) {
+  $value = trim($item[$name]);
+  $timezone_db = !empty($item['timezone_db']) ? $item['timezone_db'] : 'UTC';
+  $date = new DateObject($value, $timezone_db);
+  return !empty($date) ? date_format_date($date, 'custom', 'U') : NULL;
+}
+
+/**
+ * Getter callback to return the duration of the time period given by the dates.
+ */
+function date_entity_metadata_duration_getter($item, array $options, $name, $type) {
+  $value = date_entity_metadata_struct_getter($item, $options, 'value', 'struct');
+  $value2 = date_entity_metadata_struct_getter($item, $options, 'value2', 'struct');
+  if ($value && $value2) {
+    return $value2 - $value;
+  }
+}
+
+/**
+ * Determine if a Start/End date combination qualify as 'All day'.
+ *
+ * @param array $field, the field definition for this date field.
+ * @param object $date1, a date/time object for the 'Start' date.
+ * @param object $date2, a date/time object for the 'End' date.
+ * @return TRUE or FALSE.
+ */
+function date_field_all_day($field, $instance, $date1, $date2 = NULL) {
+  if (empty($date1) || !is_object($date1)) {
+    return FALSE;
+  }
+  elseif (!date_has_time($field['settings']['granularity'])) {
+    return TRUE;
+  }
+  if (empty($date2)) {
+    $date2 = $date1;
+  }
+
+  $granularity = date_granularity_precision($field['settings']['granularity']);
+  $increment = isset($instance['widget']['settings']['increment']) ? $instance['widget']['settings']['increment'] : 1;
+  return date_is_all_day(date_format($date1, DATE_FORMAT_DATETIME), date_format($date2, DATE_FORMAT_DATETIME), $granularity, $increment);
+
+}

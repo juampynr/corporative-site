@@ -1,0 +1,84 @@
+# LANGUAGE translation of PROJECT
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Site Map 4.7\n"
+"POT-Creation-Date: 2005-07-25 16:59+0200\n"
+"PO-Revision-Date: 2007-07-28 05:04+0100\n"
+"Last-Translator: Francisco Diéguez Souto <cuppido@gmail.com>\n"
+"Language-Team: WaPoNe <michele.fantetti@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Country: ITALY\n"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:13
+msgid "Display a site map."
+msgstr "Mostra o mapa do sitio."
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:35
+msgid "Site map message"
+msgstr "Mensaxe do mapa do sitio"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:35
+msgid "Define a message to be displayed above the site map."
+msgstr "Define a mensaxe que será mostrada enriba do mapa do sitio."
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:36
+msgid "Show node counts by categories"
+msgstr "Mostrar numero de nodos nas categorías."
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:36
+msgid "When enabled, this option will show the number of nodes in each taxonomy term."
+msgstr "Cando está habilitado, esta opción mostrará o número de nodos en cada termo de taxonomía."
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:37
+msgid "Include navigation menus"
+msgstr "Incluír os menús de navegación"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:37
+msgid "When enabled, this option will include the fully-expanded top-level navigation menus in the site map"
+msgstr "Cando está habilitado, esta opción incluirá os menus de navegación do nivel superior expandidos no mapa do sitio"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:38
+msgid "Include RSS links by categories"
+msgstr "Incluír as ligazóns RSS das categorías"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:38
+msgid "When enabled, this option will show links to the RSS feeds for each category."
+msgstr "Cando está habilitada, esta opción mostrará ligazóns ós feeds RSS para cada categoría."
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:39
+msgid "RSS feed depth"
+msgstr "Profundidade do feed RSS"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:39
+msgid "Specify how many subcategories should be included in the RSS feed.  Enter \"all\" to include all subcategories or \"0\" to include no subcategories."
+msgstr "Especifica cantas subcategorías serán incluídas no feed RSS. Insira \"all\" para incluir tódalas subcategorías ou \"0\" para non incluír subcategorías."
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:48
+msgid "Categories to include in the site map"
+msgstr "Categorías a incluír no mapa do sitio"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:59
+msgid "site map"
+msgstr "Mapa do sitio"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:140
+msgid "RSS"
+msgstr "RSS"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:28
+msgid "access site map"
+msgstr "acceso ó mapa do sitio"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:28
+msgid "administer site map"
+msgstr "administrar Mapa del sitio"
+
+#: d:\drupal-contributions-4-6\modules\site_map\site_map.module:0
+msgid "site_map"
+msgstr "Mapa del sitio"
+

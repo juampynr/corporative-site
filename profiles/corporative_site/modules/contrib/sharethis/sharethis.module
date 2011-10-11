@@ -1,0 +1,366 @@
+<?php
+/**
+ * @file
+ * A module that adds one of the ShareThis widget to your website.
+ */
+
+/**
+ * Implements hook_help.
+ *
+ * Displays help and module information.
+ *
+ * @param path 
+ *   Which path of the site we're using to display help
+ * @param arg 
+ *   Array that holds the current path as returned from arg() function
+ */
+function sharethis_help($path, $arg) {
+  global $base_url;
+  switch ($path) {
+    case "admin/help#sharethis":
+      $return_value = "<p>" . t("This plugin places the ShareThis widget on each node.") . '</p><p>';
+      return $return_value . t('For various configuration options please got to') . ' <a href="' . $base_url . '/admin/config/sharethis">The Settings Page</a></p><p>' . t('For more information, please visit') . ' <a href="http://help.sharethis.com/integration/drupal">help.sharethis.com</a></p><br />';
+      break;
+  }
+} 
+
+ /**
+ * Implements hook_admin.
+ *
+ * ShareThis Config Menu.
+ */
+function sharethis_admin() {
+  // First, setup variables we will need.
+  // Get the path variables setup.
+  $my_path = drupal_get_path('module', 'sharethis');
+  $current_options_array = get_options_array();
+  global $base_url;
+  // Load the css and js for our module's configuration.
+  drupal_add_css($my_path . '/ShareThisForm.css');
+  drupal_add_js('https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js', 'external'); // @TODO: Do we really need to load jQuery twice?
+  drupal_add_js('http://w.sharethis.com/share5x/js/stcommon.js', 'external');  //This is ShareThis's common library - has a serviceList of all the objects that are currently supported.
+  drupal_add_js($my_path . '/ShareThisForm.js');
+  drupal_add_js($my_path . '/stlib_picker.js');
+  drupal_add_css($my_path . '/stlib_picker.css');
+ 
+  return drupal_get_form('sharethis_form'); 
+}
+
+ /**
+ * This is the main configuration form for the admin page.
+ */
+function sharethis_form($form, &$form_state) {
+  // First, setup variables we will need.
+  // Get the path variables setup.
+  $my_path = drupal_get_path('module', 'sharethis');
+  $current_options_array = get_options_array();
+  global $base_url;
+  
+  // Create the variables related to widget choice.
+  $widget_type = $current_options_array['widget'];
+  $widget_markup = "";
+  if ($widget_type == "st_multi") {
+    $widget_markup = "st_multi";
+  }
+  // Create the variables related to button choice.
+  $button_choice = $current_options_array['buttons'];
+  // Create the variables related to services chosen.
+  $service_string = $current_options_array['services'];
+  $service_string_markup = "";
+  foreach (explode(",", $service_string) as $name => $string) {
+    $key = explode(":", substr($string, 0, -1));
+    $key = $key[1];
+    $service_string_markup .= "\"" . $key . "\",";
+  }
+  $service_string_markup = substr($service_string_markup, 0, -1);
+  
+  // Create an array of node types.
+  $node_type_array = node_type_get_types();
+  $node_type_options = array();
+  foreach ($node_type_array as $k => $v) {
+    $node_type_options[$k] = $v->name;
+  }
+  // Figure out which nodeTypes are currently selected
+  $nodes_string = $current_options_array['nodeType'];
+  $nodes_selected = explode(",", $nodes_string);
+  // Create the variables for publisher keys.
+  $publisher = $current_options_array['publisherID'];
+  // Create the variables for teasers.
+  $teaser = $current_options_array['viewMode'] == "1" ? TRUE : FALSE;
+  
+  $form = array();
+  $form['options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('ShareThis Configuration Settings:')
+  );
+  $form['options']['widget_option'] = array(
+    '#options' => array(
+      'st_multi' => t("Multi-Post Widget"),
+      'st_direct' => t("Direct-Post Widget")
+    ),
+    '#default_value' => $widget_type,
+    '#type' => 'radios',
+    '#required' => TRUE,
+    '#title' => t("Choose a widget type:"),
+    '#prefix' => '<div class="st_widgetContain"><div class="st_widgetPic ' . $widget_markup . '"><div class="st_widgetPicContain"><img src="' . $base_url . '/' . $my_path . '/img/widget.png"></img></div></div>',
+    '#suffix' => '</div>'
+  );
+  $form['options']['button_option'] = array(
+    '#required' => TRUE,
+    '#type' => 'radios',
+    '#options' => array(
+      'stbc_large' => t("Large Chicklets"),
+      'stbc_' => t("Small Chicklets"),
+      'stbc_button' => t("Classic Buttons"),
+      'stbc_vcount' => t("Vertical Counters"),
+      'stbc_hcount' => t("Horizontal Counters")
+    ),
+    '#default_value' => $button_choice,
+    '#title' => t("Choose a button style:"),
+    '#prefix' => '<div class="st_widgetContain"><div class="st_spriteCover"><img id="stb_sprite" class="st_buttonSelectSprite ' . $button_choice . '" src="' . $base_url . '/' . $my_path . '/img/preview_sprite.png"></img></div><div class="st_widgetPic"><img class="st_buttonSelectImage" src="' . $base_url . '/' . $my_path . '/img/preview_bg.png"></img></div>',
+    '#suffix' => '</div>'
+  );
+  $form['options']['teaser_option'] = array(
+    '#title' => t("Don't show the buttons in teaser view."),
+    '#type' => 'checkbox',
+    '#default_value' => $teaser ? 1 : 0,
+  );
+  $form['options']['service_option'] = array(
+    '#description' => t("<b>Add</b> a service by selecting it on the right and clicking the <i>left arrow</i>.  <b>Remove</b> it by clicking the <i>right arrow</i>.<br /><b>Change the order</b> of services under \"Selected Services\" by using the <i>up</i> and <i>down</i> arrows."),
+    '#required' => TRUE,
+    '#type' => 'textfield',
+    '#prefix' => '<div>',
+    '#suffix' => '</div><div id="myPicker"></div><script type="text/javascript">stlib_picker.setupPicker($("#myPicker"), [' . $service_string_markup . '], drupal_st.serviceCallback);</script>',
+    '#title' => t("Choose Your Services."),
+    '#default_value' => t($service_string)
+  );
+  $form['options']['node_option'] = array(
+    '#title' => t("Choose the node types you want to show the buttons on."),
+    '#required' => TRUE,
+    '#type' => 'checkboxes',
+    '#options' => $node_type_options,
+    '#default_value' => $nodes_selected
+  );
+  $form['options']['publisherID'] = array(
+    '#title' => t("Insert a publisher key (optional)."),
+    '#description' => t("If you don't have a publisher key, go to <a href='http://www.sharethis.com/account'>ShareThis</a> and get one.<br />It can be found under 'My Account'.<br />It allows you to get detailed analytics about sharing done on your site."),
+    '#type' => 'textfield',
+    '#default_value' => $publisher
+  );
+  $form['options']['submit'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Submit')
+  );
+  return $form; 
+}
+
+ /**
+ * This is the submit function for sharethis_form
+ */
+function sharethis_form_submit($form, &$form_state) {
+  // Record the widget option.
+  if (isset($form_state['input']['widget_option'])) {
+    $record = (object) NULL;
+    $record->st_option = "widget";
+    $record->st_value = $form_state['input']['widget_option']; 
+    drupal_write_record('st_table', $record, 'st_option');
+  }
+  
+  // Record the buttons option.
+  if (isset($form_state['input']['button_option'])) {
+    $record = (object) NULL;
+    $record->st_option = "buttons";
+    $record->st_value = $form_state['input']['button_option']; 
+    drupal_write_record('st_table', $record, 'st_option'); 
+  }
+  // Record the services option.
+  if (isset($form_state['input']['service_option'])) {
+    $record = (object) NULL;
+    $record->st_option = "services";
+    $sanitized = $form_state['input']['service_option'];
+    $sanitized = str_replace(";", "", $sanitized);
+    $sanitized = str_replace("\\", "", $sanitized);
+    $sanitized = str_replace("/", "", $sanitized);
+    $sanitized = str_replace("(", "", $sanitized);
+    $sanitized = str_replace(")", "", $sanitized);
+    $record->st_value = $sanitized; 
+    drupal_write_record('st_table', $record, 'st_option');
+  }
+  
+  // Record the NodeType option.
+  if (isset($form_state['input']['node_option'])) {
+    $record = (object) NULL;
+    $record->st_option = "nodeType";
+    $node_string = "";
+    foreach ($form_state['input']['node_option'] as $k => $v) {
+      $node_string .= $v . ",";
+    }
+    $record->st_value = substr($node_string, 0, -1); 
+    drupal_write_record('st_table', $record, 'st_option');
+  }  
+  
+  // Record the teaser option.
+  if (isset($form_state['input']['teaser_option'])) {
+    $record = (object) NULL;
+    $record->st_option = "viewMode";
+    $record->st_value = $form_state['input']['teaser_option']; 
+    drupal_write_record('st_table', $record, 'st_option');
+  } 
+  else {
+    $record = (object) NULL;
+    $record->st_option = "viewMode";
+    $record->st_value = "0"; 
+    drupal_write_record('st_table', $record, 'st_option');
+  }
+  
+  // Record the publisher ID option.  Since it's a text field, remove anything that resembles code
+  if (isset($form_state['input']['publisherID'])) {
+    $record = (object) NULL;
+    $record->st_option = "publisherID";
+    $sanitized = $form_state['input']['publisherID'];
+    $sanitized = str_replace(";", "", $sanitized);
+    $sanitized = str_replace(":", "", $sanitized);
+    $sanitized = str_replace("\\", "", $sanitized);
+    $sanitized = str_replace("/", "", $sanitized);
+    $sanitized = str_replace("(", "", $sanitized);
+    $sanitized = str_replace(")", "", $sanitized);
+    $record->st_value = $sanitized; 
+    drupal_write_record('st_table', $record, 'st_option');
+  }
+ 
+  drupal_set_message(t("Thank you! Your preferences have been saved."));
+}
+ 
+ /**
+ * Implements hook_menu.
+ *
+ * This is the ShareThis Config Menu.
+ */
+function sharethis_menu() {
+  $items['admin/config/sharethis'] = array(
+    'title' => 'ShareThis Settings',
+    'description' => 'Choose widget, button family, and services!',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sharethis_admin'),
+    'access arguments' => array('access administration pages')
+  );
+  $items['admin/config/sharethisDB'] = array(
+    'page callback' => 'sharethis_DB_update',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access administration pages'),
+  );
+  return $items;
+}
+
+ /**
+ * Implements hook_node_view.
+ *
+ * Inserts ShareThis widget code onto each node view.
+ * TODO: Want to add the option somewhere to select nodes.
+ *
+ * @param node 
+ *   The node that is being acted upon
+ * @param view_mode 
+ *   The type of view (teaser, full, etc)
+ * @param langcode
+ *   Information about the language
+ */
+function sharethis_node_view($node, $view_mode, $langcode) {
+
+  // First get all of the options for the sharethis widget from the database:
+  $data_options = get_options_array();
+  
+  // This looks to see if the path variable has been posted by some rewrite module.
+  // This is not super efficient, O(N), but N is often less than 20.
+  $is_path = FALSE;
+  foreach ($node as $k => $v) {
+    if ($k == "path") {
+      $is_path = TRUE;
+    }
+  }
+  // This will choose the path to use.
+  if ($is_path) {
+    $path_module = $node->path;
+  }
+  else {
+    $path_module = "/node/" . $node->nid;
+  }
+  global $base_url;
+  // Get the full path to insert into the Share Buttons.
+  $mPath = $base_url . $path_module;
+  $mTitle = $node->title;
+  
+  // Only display the ShareThis buttons if this node fits all the requirements
+  if (strpos($data_options['nodeType'], $node->type) !== FALSE) { // Make sure this is the right type of node.
+    if (($data_options['viewMode'] == "1") && ($view_mode == "teaser")) { // If "don't show for teaser" is enabled, and this is a teaser, don't do anything
+      // Do nothing.
+    } 
+    else {
+      // Create the code for chicklets.
+  
+      // The share buttons are simply spans of the form class='st_SERVICE_BUTTONTYPE' -- "st" stands for ShareThis.
+      $type = substr($data_options['buttons'], 4);
+      $type = $type == "_" ? "" : $type;
+      $service_array = explode(",", $data_options['services']);
+      $st_spans = "";
+      for ($i=0; $i<sizeof($service_array); $i++) {
+        // Strip the quotes from the element in the array (They are there for javascript)
+        $service = explode(":", $service_array[$i]);
+        $serviceCodeName = substr($service[1], 0, -1);
+        $display = "displaytext=";
+        $display .= $service[0] . "\"";
+        $display = ($type == "") ? "" : $display;
+        $st_spans .= "<span st_url=$mPath st_title='$mTitle' class='st_$serviceCodeName$type' $display></span>";
+      }
+  
+      // These are the ShareThis scripts:
+      // If switchTo5x is set to false, then the "classic" widget will be selected.
+      $is_five = $data_options['widget'] == 'st_multi' ? 'true' : 'false';
+      $publisher_id = $data_options['publisherID'];
+      $st_js = "<script type='text/javascript'>var switchTo5x=$is_five;</script>
+        <script type='text/javascript' src='http://w.sharethis.com/button/buttons.js'></script>
+        <script type='text/javascript'>stLight.options({publisher:'$publisher_id'});</script>";
+
+      // This puts the buttons on the node and adds the necessary scripts.
+      // You can change the weight to change whether the buttons are near the top or bottom of the node.
+      // Default is at the bottom:
+      $node->content['my_additional_field'] = array(
+        '#markup' => $st_spans . $st_js, 
+        '#weight' => 10
+      );
+    }
+  }
+}
+
+ /**
+ * getOptionArray is a helper function for DB access.
+ *
+ * Returns options that have been stored in the database.
+ */
+function get_options_array() {
+  $data_options = array();
+  $sql = "SELECT st.st_option, st.st_value FROM {st_table} st";
+  $result = db_query($sql);
+  foreach ($result as $record) {
+    $data_options[$record->st_option] = $record->st_value;
+  }
+  return $data_options;
+}
+
+ /**
+ * sharethis_DB_update
+ *
+ * This is the Callback function when you save the options on the configuration page.
+ * All it does is update the database with all the posted values.
+ */
+function sharethis_DB_update($form, &$form_state) {
+
+  foreach ($_POST as $k => $v) {
+    $record = (object) NULL;
+    $record->st_option = $k;
+    $record->st_value = $v; 
+    drupal_write_record('st_table', $record, 'st_option'); 
+  }
+  echo "<p>" . t("Changes have been successfully saved!") . "</p>";
+  
+}

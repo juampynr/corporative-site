@@ -1,0 +1,94 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the fb_social module.
+ *
+ */
+
+/**
+ * Implements hook_install().
+ */
+function fb_social_install() {
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function fb_social_uninstall() {
+
+  // delete system variables
+  variable_del('fb_social_appid');
+  variable_del('fb_social_secret');
+  variable_del('fb_social_locale');
+  variable_del('fb_social_urls_mode');
+  variable_del('fb_social_locale_auto');
+  $languages = language_list();
+  foreach ($languages as $language) {
+    variable_del('fb_social_language_' . $language->language);
+  }
+  
+}
+
+
+/**
+ * Implements hook_schema().
+ */
+function fb_social_schema() {
+  $schema = array();
+
+  $schema['fb_social_preset'] = array(
+    'description' => 'Storage for user-defined fb plugins templates.',
+    'export' => array(
+      'key' => 'name',
+      'identifier' => 'fb_social_preset',
+      'default hook' => 'fb_social_default_presets', // Function hook name.
+      'api' => array(
+        'owner' => 'fb_social',
+        'api' => 'fb_social', // Base name for api include files.
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+      'load callback' => 'fb_social_preset_load',
+    ),
+    'fields' => array(
+      'name' => array(
+        'description' => 'The primary identifier for a plugin preset.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'description' => array(
+        'description' => 'Description for this plugin preset.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'plugin_type' => array(
+        'description' => 'Type of this preset.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'settings' => array(
+        'description' => 'Serialized storage of drupal related plugin settings.',
+        'type' => 'text',
+        'serialize' => TRUE,
+      ),
+      'fb_attrs' => array(
+        'description' => 'Serialized storage of facebook related plugin settings',
+        'type' => 'text',
+        'serialize' => TRUE,
+      ),
+    ),
+    'primary key' => array('name'),
+    'indexes' => array(
+      'type' => array('plugin_type'),
+    ),
+  );
+
+  return $schema;
+
+}

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Homepage feature.
+ */
+
+include_once('feature_homepage.features.inc');

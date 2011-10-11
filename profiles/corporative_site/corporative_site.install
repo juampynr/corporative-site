@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * Implements hook_install().
+ *
+ * Perform actions to set up the site for this profile.
+ */
+function corporative_site_install() {
+  include_once DRUPAL_ROOT . '/profiles/standard/standard.install';
+  standard_install();
+  
+  // Enable transliteration on paths (á turns into a)
+  variable_set('pathauto_transliterate', 1);
+
+  // Create an empty page as the front page
+  $fields = array('path' => 'home');
+  db_insert('empty_page')->fields($fields)->execute();
+  variable_set('site_frontpage', 'home');
+
+  // Place the search box in the header region
+  db_update('block')->fields(
+    array(
+      'region' => 'header',
+    )
+  )
+  ->condition('module', 'search', '=')
+  ->condition('theme', 'bartik', '=')
+  ->execute();
+}

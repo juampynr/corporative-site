@@ -1,0 +1,157 @@
+# LANGUAGE translation of Drupal (site_map.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: site_map.module,v 1.18.2.1 2006/08/24 07:26:07 frjo
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2006-08-24 11:39-0600\n"
+"PO-Revision-Date: 2006-08-24 14:13-0500\n"
+"Last-Translator: Yannick Forest <forestyan@aei.ca>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-Language: French\n"
+
+#: site_map.module:16
+msgid "Display a site map."
+msgstr "Afficher un plan du site"
+
+#: site_map.module:36
+msgid "Site map message"
+msgstr "Message du plan du site"
+
+#: site_map.module:40
+msgid "Define a message to be displayed above the site map."
+msgstr "Définir un message à afficher au dessus du plan du site."
+
+#: site_map.module:45
+msgid "Site map content"
+msgstr "Contenu du plan du site"
+
+#: site_map.module:49
+msgid "Show recent blog authors"
+msgstr "Montrer les auteurs de blogues récents"
+
+#: site_map.module:52
+msgid "When enabled, this option will show the recent blog authors."
+msgstr "Activée, cette option vous montrera les auteurs de blogs récents."
+
+#: site_map.module:59;71;81
+msgid "<none>"
+msgstr ""
+
+#: site_map.module:62
+msgid "Books to include in the site map"
+msgstr "Livres à inclure dans le plan du site"
+
+#: site_map.module:74
+msgid "Categories to include in the site map"
+msgstr "Catégories à inclure dans le plan du site"
+
+#: site_map.module:84
+msgid "Menu to include in the site map"
+msgstr "Menu à inclure dans le plan du site"
+
+#: site_map.module:91
+msgid "Categories settings"
+msgstr "Paramètres des catégories"
+
+#: site_map.module:95
+msgid "Show books expanded"
+msgstr "Montrer les livres dépliés"
+
+#: site_map.module:98
+msgid "When enabled, this option will show all children pages for each book."
+msgstr "Affichée, cette option montrera les pages enfants pour chaque livre"
+
+#: site_map.module:102
+msgid "Show node counts by categories"
+msgstr "Montrer les compteurs des noeuds par catégorie"
+
+#: site_map.module:105
+msgid "When enabled, this option will show the number of nodes in each taxonomy term."
+msgstr "Activée, cette option montrera le nombre de noeuds dans chaque terme de taxonomie"
+
+#: site_map.module:109
+msgid "Categories depth"
+msgstr "Profondeur des catégories"
+
+#: site_map.module:113
+msgid "Specify how many subcategories should be included on the categorie page.  Enter \"all\" to include all subcategories or \"0\" to include no subcategories."
+msgstr "Indiquer combien de sous-catégories devraient être incluses dans les catégories. Entrez \"all\" pour inclure toutes les sous-catégories ou \"0\" pour ne pas inclure de sous-catégorie"
+
+#: site_map.module:118
+msgid "RSS settings"
+msgstr "Paramètres RSS"
+
+#: site_map.module:122
+msgid "Include RSS links"
+msgstr "Inclure les liens RSS"
+
+#: site_map.module:125
+msgid "When enabled, this option will show links to the RSS feeds for each category and blog."
+msgstr "Activée, cette option montrera les liens vers les flux RSS pour chaque catégorie et blogue."
+
+#: site_map.module:129
+msgid "RSS feed depth"
+msgstr "Profondeur des flux RSS"
+
+#: site_map.module:133
+msgid "Specify how many subcategories should be included in the RSS feed.  Enter \"all\" to include all subcategories or \"0\" to include no subcategories."
+msgstr "Indiquer combien de sous-catégories devraient être incluses dans le flux RSS. Entrez \"all\" pour inclure toutes les sous-catégories ou \"0\" pour ne pas inclure de sous-catégorie"
+
+#: site_map.module:148
+msgid "site map"
+msgstr "plan du site"
+
+#: site_map.module:194
+msgid "Front page"
+msgstr "Page d'accueil"
+
+#: site_map.module:195
+msgid "Front page of %sn"
+msgstr "Page d'accueil de %sn"
+
+#: site_map.module:195;210;216;342
+msgid "RSS"
+msgstr "RSS"
+
+#: site_map.module:195;210;216;342
+msgid "Syndicate content"
+msgstr "Syndiquer le contenu"
+
+#: site_map.module:206
+msgid "Blogs"
+msgstr "Blogues"
+
+#: site_map.module:207
+msgid "Community blog and recent blog authors at <i>%sn</i>."
+msgstr "Blogues communautaires et auteurs récents de <i>%sn</i>."
+
+#: site_map.module:210
+msgid "All blogs"
+msgstr "Tous les blogues"
+
+#: site_map.module:216
+msgid "%s's blog"
+msgstr "blogues de %s"
+
+#: site_map.module:230
+msgid "Books"
+msgstr "Livres"
+
+#: site_map.module:231
+msgid "Books at <i>%sn</i>."
+msgstr "Livres de <i>%sn</i>."
+
+#: site_map.module:26
+msgid "access site map"
+msgstr "accès au plan du site"
+
+#: site_map.module:0
+msgid "site_map"
+msgstr "plan du site"
+

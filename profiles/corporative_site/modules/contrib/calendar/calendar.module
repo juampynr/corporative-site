@@ -1,0 +1,304 @@
+<?php
+define('CALENDAR_SHOW_ALL', 0);
+define('CALENDAR_HIDE_ALL', -1);
+
+/**
+ * @file
+ * Adds calendar filtering and displays to Views.
+ */
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Takes the calendar links created in calendar_preprocess_date_views_pager()
+ * and reconfigures them as action items and tabs. The links can be altered
+ * before they are displayed using hook_calendar_links_alter().
+ *
+ * We do this with an alter rather than in hook_menu() because the
+ * specific path we want to go to will vary depending on the page we
+ * are looking at at the time.
+ */
+function calendar_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  if (!empty($_SESSION['calendar_links']) && array_key_exists($root_path, $_SESSION['calendar_links'])) {
+    $calendar_data = $_SESSION['calendar_links'][$root_path];
+    if (!empty($calendar_data['actions'])) {
+      foreach ($calendar_data['actions'] as $action) {
+        $item = menu_get_item($action['path']);
+        $item['title'] = $action['title'];
+        // The add new content page would redirect to the new event
+        // if we did not override that here. This way they will
+        // redirect back to the calendar.
+        $item['localized_options'] += array('query' => array());
+        $item['localized_options']['query'] += drupal_get_destination();
+        if ($item['access']) {
+          $data['actions']['output'][] = array(
+            '#theme' => 'menu_local_action',
+            '#link' => $item,
+          );
+        }
+      }
+    }
+    if (!empty($calendar_data['tabs'])) {
+      $delta = !empty($data['tabs'][0]['count']) ? $data['tabs'][0]['count'] - 1 : 0;
+      foreach ($calendar_data['tabs'] as $tab) {
+        $item = menu_get_item($tab['path']);
+        if (!empty($item)) {
+          $item['title'] = $tab['title'];
+          // If we have moved off the default page for the calendar, the
+          // links to the other views will have been adjusted to keep information
+          // about the right year/month/week/day to go to.
+          $item['href'] = $tab['path'];
+          if ($item['access']) {
+            $data['tabs'][0]['output'][$delta] = array(
+              '#theme' => 'menu_local_task',
+              '#link' => $item,
+            );
+            if (strpos($tab['path'], $root_path) === 0) {
+              $data['tabs'][0]['output'][$delta]['#active'] = TRUE;
+            }
+            $delta++;
+          }
+        }
+        $data['tabs'][0]['count'] = $delta + 1;
+      }
+    }
+  }
+  return;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function calendar_views_api() {
+  return array(
+    'api' => 3.0,
+    'path' => drupal_get_path('module', 'calendar') . '/includes',
+  );
+}
+
+/**
+ * Calendar display types.
+ */
+function calendar_display_types() {
+  return array('year' => t('Year'), 'month' => t('Month'), 'day' => t('Day'), 'week' => t('Week'));  
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function calendar_help($section, $arg) {
+  switch ($section) {
+    case 'admin/help#calendar':
+      return t("<p>View complete documentation at !link.</p>", array('!link' => 'http://drupal.org/node/120710'));
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function calendar_theme() {
+  $module_path = drupal_get_path('module', 'calendar');
+
+  $base = array(
+    'file' => 'theme.inc',
+    'path' => "$module_path/theme",
+  );
+  return array(
+    'calendar_item' => $base + array(
+      'template' => 'calendar-item',
+      'variables' => array('view' => NULL, 'rendered_fields' => NULL, 'item' => NULL),
+      ),
+    'calendar_datebox' => $base + array(
+      'template' => 'calendar-datebox',
+      'variables' => array(
+        'date' => NULL, 'view' => NULL, 'items' => NULL, 'selected' => NULL),
+      ),
+    'calendar_empty_day' => $base + array(
+      'variables' => array('curday' => NULL, 'view' => NULL),
+      ),
+    'calendar_stripe_legend' => $base + array(
+      'variables' => array('stripe_labels' => NULL),
+      ),
+    'calendar_stripe_stripe' => $base + array(
+      'variables' => array('node' => NULL),
+      ),
+    'calendar_time_row_heading' => $base + array(
+      'variables' => array('start_time' => NULL, 'next_start_time' => NULL, 'curday_date' => NULL),
+      ),
+    'calendar_month_col' => $base + array(
+      'template' => 'calendar-month-col',
+      'variables' => array('item' => NULL),
+      ),  
+    'calendar_month_row' => $base + array(
+      'template' => 'calendar-month-row',
+      'variables' => array('inner' => NULL, 'class' => NULL, 'iehint' => NULL),
+      ),
+    );
+}
+
+/**
+ * Implements hook_node_view().
+ *
+ * Add link to calendar to nodes, formerly hook_link().
+ * Controlled by value of 'calendar_date_link' in the view.
+ */
+function calendar_node_view($node, $view_mode, $langcode) {
+  $path = variable_get('calendar_date_link_' . $node->type);
+  if (!empty($path)) {
+    $links['calendar_link'] = array(
+      'title' => t('Calendar'),
+      'href' => $path,
+      'attributes' => array('title' => t('View the calendar.')),
+    );
+    $node->content['links']['calendar'] = array(
+      '#theme' => 'links__node__caledar',
+      '#links' => $links,
+      '#attributes' => array('class' => array('links', 'inline')),
+    );
+  }
+}
+
+/**
+ * Formats the weekday information into table header format
+ *
+ * @ingroup event_support
+ * @return array with weekday table header data
+ */
+function calendar_week_header($view) {
+  $len = isset($view->date_info->style_name_size) ? $view->date_info->style_name_size : (!empty($view->date_info->mini) ? 1 : 3);
+  $with_week = !empty($view->date_info->style_with_weekno);
+
+  // create week header
+  $untranslated_days = calendar_untranslated_days();
+  if ($len == 99) {
+    $translated_days = date_week_days_ordered(date_week_days(TRUE));
+  }
+  else {
+    $translated_days = date_week_days_ordered(date_week_days_abbr(TRUE));
+  }
+  if ($with_week) {
+    $row[] = array('header' => TRUE, 'class' => "days week", 'data' => '&nbsp;');
+  }
+  foreach ($untranslated_days as $delta => $day) {
+    $label = $len < 3 ? drupal_substr($translated_days[$delta], 0 , $len) : $translated_days[$delta];
+    $row[] = array('header' => TRUE, 'class' => "days " . $day, 'data' => $label);
+  }
+  return $row;
+}
+
+/**
+ * Array of untranslated day name abbreviations, forced to lowercase
+ * and ordered appropriately for the site setting for the first day of week.
+ *
+ * The untranslated day abbreviation is used in css classes.
+ */
+function calendar_untranslated_days() {
+  $untranslated_days = date_week_days_ordered(date_week_days_untranslated());
+  foreach ($untranslated_days as $delta => $day) {
+    $untranslated_days[$delta] = strtolower(substr($day, 0, 3));
+  }
+  return $untranslated_days;
+}
+
+/**
+ * Default settings array for calendar time grouping.
+ */
+function calendar_groupby_times($type = '') {
+  $times = array();
+  switch ($type) {
+    case 'hour':
+      for ($i = 0; $i <= 23; $i++) {
+        $times[] = date_pad($i) . ':00:00';
+      }
+      break;
+    case 'half':
+      for ($i = 0; $i <= 23; $i++) {
+        $times[] = date_pad($i) . ':00:00';
+        $times[] = date_pad($i) . ':30:00';
+      }
+      break;
+    default:
+      break;
+  }
+  return $times;
+}
+
+/**
+ *  Implementation of hook_block_info()
+ */
+function calendar_block_info() {
+  $blocks['calendar_legend'] = array(
+    'info' => t('Calendar Legend'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+
+/**
+ *  Implementation of hook_block_view().
+ */
+function calendar_block_view($delta = '') {
+  switch ($delta) {
+    case 'calendar_legend':
+      $block['subject'] = t('Calendar Legend');
+      $block['content'] = array(
+        '#theme' => 'calendar_stripe_legend',
+      );
+      return $block;
+  }
+}
+
+/**
+ * Find the path for the calendar display that has a specific granularity.
+ */
+function calendar_granularity_path(&$view, $granularity) {
+  $paths = &drupal_static(__FUNCTION__, array());
+  if (!array_key_exists($view->name, $paths) || !(array_key_exists($granularity, $paths[$view->name]))) {
+    $paths[$view->name][$granularity] = '';
+    foreach($view->display as $id => $display) {
+      // Check for !empty() in case the view is not fully formed or has displays that are marked to be deleted
+      if (!empty($display->deleted) || empty($display->display_options['style_plugin'])) {
+        continue;
+      }
+      if ($display->display_options['style_plugin'] == 'calendar_style' && !empty($display->display_options['path'])) {
+        $type = !empty($display->display_options['style_options']['calendar_type']) ? $display->display_options['style_options']['calendar_type'] : 'month';
+        if ($type == $granularity) {
+          $paths[$view->name][$granularity] = $display->display_options['path'];
+        }
+      }
+    }
+  }
+  return $paths[$view->name][$granularity];
+}
+
+/**
+ * Callback to remove a default calendar from the system.
+ */
+function calendar_remove($view_name) {
+  // Remove any variable that creates a default view with this name.
+  $calendar_options = variable_get('calendar_default_view_options', array());
+  if (array_key_exists($view_name, $calendar_options)) {
+    unset($calendar_options[$view_name]);
+  }
+  variable_set('calendar_default_view_options', $calendar_options);
+  // Delete it from the database, if stored there.
+  if ($view = views_get_view($view_name)) {
+    $view->delete();
+  }
+  views_invalidate_cache();
+}
+
+/**
+ *  Check to make sure the user has entered a valid 6 digit hex color.
+ */
+function calendar_validate_hex_color($element, &$form_state) {
+  if (!$element['#required'] && empty($element['#value'])) {
+    return;
+  }
+  if (!preg_match('/^#(?:(?:[a-f\d]{3}){1,2})$/i', $element['#value'])) {
+    form_error($element, "'". check_plain($element['#value']) ."'". t(' is not a valid hex color'));
+  }
+  else {
+    form_set_value($element, $element['#value'], $form_state);
+  }
+}

@@ -1,0 +1,91 @@
+# German translation of Drupal (transliteration.module)
+msgid ""
+msgstr ""
+"Project-Id-Version: German translation of Drupal (transliteration.module) $Id: de.po,v 1.3 2009/12/04 14:37:26 smk Exp $\n"
+"POT-Creation-Date: 2009-11-29 16:57+0100\n"
+"PO-Revision-Date: 2009-12-04 15:35+0100\n"
+"Last-Translator: Stefan M. Kudwien <smk@unleashedmind.com>\n"
+"Language-Team: Unleashed Mind <dev@unleashedmind.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: transliteration.admin.inc:17
+msgid "Database not supported."
+msgstr "Datenbank wird nicht unterstützt."
+
+#: transliteration.admin.inc:18
+msgid "Retroactive transliteration is currently not supported on the database system this Drupal installation uses. If you think this should be fixed please <a href=\"@issues-url\">file an issue</a> in the project issue queue."
+msgstr "Die nachträgliche Transliteration wird momentan nicht für das von Drupal verwendete Datenbank-System unterstützt. Wenn Sie meinen, dass dies ein Fehler ist und behoben werden sollte, dann erstellen Sie bitte einen <a href=\"@issues-url\">Fehlerbericht</a> im Projekt."
+
+#: transliteration.admin.inc:24
+msgid "Transliteration not required."
+msgstr "Transliteration nicht erforderlich."
+
+#: transliteration.admin.inc:25
+msgid "There are currently no files containing non-ASCII characters in their name."
+msgstr "Es existieren momentan keine Dateien mit Nicht-ASCII-Zeichen im Dateinamen."
+
+#: transliteration.admin.inc:30
+msgid "Are you sure you want to transliterate existing file names?"
+msgstr "Sind Sie sicher, dass Sie alle existierenden Dateinamen transliterieren möchten?"
+
+#: transliteration.admin.inc:31
+msgid "The database currently lists @filenames containing non-ASCII characters. This count might be inaccurate, though, since it is possible that not all of them actually need to be renamed. Only local files will be processed, while off-site files will never be changed. Note that changing the file name might render references to these files void. Since there is currently no way to fix manually inserted links in contents, it is a good idea to create a database backup beforehand. This action cannot be undone."
+msgstr "Die Datenbank enthält zur Zeit @filenames, die Nicht-ASCII-Zeichen enthalten. Diese Zahl kann jedoch falsch sein, da es möglich ist, dass nicht alle Dateien umbenannt werden müssen. Nur lokale Dateien können bearbeitet werden, während Remote-Dateien niemals geändert werden. Beachten Sie bitte, dass durch eine Änderung des Dateinamens bestehende Referenzen ungültig werden können. Da es momentan keinen Weg gibt, manuell in Inhalten eingefügte Links zu diesen Dateien mitzuändern ist es eine gute Idee, vorher ein Datenbank-Backup anzufertigen. Diese Aktion kann nicht rückgängig gemacht werden."
+
+#: transliteration.admin.inc:32
+msgid "Transliterate"
+msgstr "Transliterieren"
+
+#: transliteration.admin.inc:68
+msgid "Not all file names could be converted. The following files could not be accessed and have been ignored:"
+msgstr "Nicht alle Dateinamen konnten umgewandelt werden. Auf folgende Dateien konnte nicht zugegriffen werden und wurden ignoriert:"
+
+#: transliteration.admin.inc:73
+msgid "@filenames have been successfully transliterated."
+msgstr "@filenames wurden erfolgreich transliteriert."
+
+#: transliteration.admin.inc:31;73
+msgid "1 file name"
+msgid_plural "@count file names"
+msgstr[0] "ein Dateiname"
+msgstr[1] "@count Dateinamen"
+
+#: transliteration.module:41;21
+#: transliteration.info:0
+msgid "Transliteration"
+msgstr "Transliteration"
+
+#: transliteration.module:46
+msgid "Enable transliteration of file names during upload."
+msgstr "Transliteration von Dateinamen während des Uploads."
+
+#: transliteration.module:51
+msgid "Lowercase transliterated file names."
+msgstr "Transliterierte Dateinamen kleinschreiben."
+
+#: transliteration.module:53
+msgid "This is recommended to prevent issues with case-insensitive file systems."
+msgstr "Diese Einstellung wird empfohlen um Probleme auf Dateisystemen zu verhindern, die nicht zwischen Groß- und Kleinschreibung unterscheiden."
+
+#: transliteration.module:16
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: transliteration.module:22
+msgid "Convert existing file names to US-ASCII."
+msgstr "Existierenden Dateinamen nach US-ASCII konvertieren."
+
+#: (duplicate) transliteration.install:24
+msgid "Transliteration has been installed. <a href=\"@transliteration-url\">Fix existing file names</a>."
+msgstr "Transliteration wurde installiert. <a href=\"@transliteration-url\">Existierende Dateinamen korrigieren</a>."
+
+#: transliteration.info:0
+msgid "Converts non-latin text to US-ASCII and sanitizes file names."
+msgstr "Konvertiert nicht-lateinischen Text nach US-ASCII und bereinigt Dateinamen."
+

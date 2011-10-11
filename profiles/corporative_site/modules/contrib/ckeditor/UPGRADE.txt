@@ -1,0 +1,29 @@
+## Upgrade vs. Update ##
+
+Before you continue reading we need to define the difference beween upgrading and updating:
+Upgrading refers to moving from one major release to another. 
+E.g. you are moving from Drupal 6 to Drupal 7.
+
+Updating typically refers to bringing the editor or CKEditor module up to the latest minor version (e.g 7.x-1.0 to 7.x-1.2).
+Updating instructions are available in README.txt
+
+## Upgrading CKEditor module to 7.x from 6.x ##
+
+Due to differences between the module for Drupal 6 and Drupal 7 there is no way (at least at this moment)
+to upgrade without uninstalling the previous version of the module (and losing the configuation settings stored in a database).
+
+# Upgrading #
+
+1. Backup ckeditor_role and ckeditor_settings tables
+   and write down somewhere your custom configuration settings stored in CKEditor profiles.
+2. Disable and uninstall CKEditor 6.x module.
+3. Make a backup of sites/all/modules/ckeditor folder or at least make sure to make a copy of ckeditor.config.js
+4. Delete the contents of sites/all/modules/ckeditor folder.
+5. Follow README.txt to install CKEditor module for Drupal 7.
+6. Adjust CKEditor profiles to your needs.
+7. If you have made any changes to ckeditor.config.js in Drupal 6, check the default config file distributed with the module for Drupal 7 and reapply the changes.
+
+
+## Migrating from FCKeditor module ##
+
+Please read "Upgrading from Drupal 6.x" section.

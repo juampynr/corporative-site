@@ -1,0 +1,17 @@
+name = "PDF version"
+description = "Adds the capability to export pages as PDF."
+core=7.x
+package = "Printer, e-mail and PDF versions"
+dependencies[] = print
+files[] = print_pdf.module
+files[] = print_pdf.admin.inc
+files[] = print_pdf.pages.inc
+files[] = print_pdf.install
+configure = admin/config/user-interface/print/pdf
+
+; Information added by drupal.org packaging script on 2011-07-21
+version = "7.x-1.0-alpha1"
+core = "7.x"
+project = "print"
+datestamp = "1311207167"
+

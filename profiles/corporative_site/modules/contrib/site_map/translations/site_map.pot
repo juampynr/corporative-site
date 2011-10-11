@@ -1,0 +1,274 @@
+# $Id: site_map.pot,v 1.2 2010/01/04 05:24:46 frjo Exp $
+#
+# LANGUAGE translation of Drupal (site_map.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  site_map.admin.inc,v 1.1.2.6 2009/04/07 07:42:22 frjo
+#  site_map.module,v 1.39.2.13 2009/04/22 04:59:38 frjo
+#  site_map.info,v 1.4 2007/09/26 14:13:37 frjo
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-06-29 21:00+0200\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: site_map.admin.inc:22;38
+msgid "Site map message"
+msgstr ""
+
+#: site_map.admin.inc:23;42
+msgid "Define a message to be displayed above the site map."
+msgstr ""
+
+#: site_map.admin.inc:28
+msgid "For language %lang_name (code %lang_code)"
+msgstr ""
+
+#: site_map.admin.inc:48
+msgid "Site map content"
+msgstr ""
+
+#: site_map.admin.inc:52
+msgid "Show front page"
+msgstr ""
+
+#: site_map.admin.inc:54
+msgid "When enabled, this option will include the front page in the site map."
+msgstr ""
+
+#: site_map.admin.inc:58
+msgid "Show active blog authors"
+msgstr ""
+
+#: site_map.admin.inc:60
+msgid "When enabled, this option will show the 10 most active blog authors."
+msgstr ""
+
+#: site_map.admin.inc:70
+msgid "Books to include in the site map"
+msgstr ""
+
+#: site_map.admin.inc:74;94;105;126
+msgid "Ctrl-click (Windows) or Command-click (Mac) to select more than one value."
+msgstr ""
+
+#: site_map.admin.inc:90
+msgid "Menus to include in the site map for !lang (code !code)"
+msgstr ""
+
+#: site_map.admin.inc:101
+msgid "Menus to include in the site map"
+msgstr ""
+
+#: site_map.admin.inc:110
+msgid "Show FAQ content"
+msgstr ""
+
+#: site_map.admin.inc:112
+msgid "When enabled, this option will include the content from the FAQ module in the site map."
+msgstr ""
+
+#: site_map.admin.inc:122
+msgid "Categories to include in the site map"
+msgstr ""
+
+#: site_map.admin.inc:130
+msgid "Do not include site map CSS file"
+msgstr ""
+
+#: site_map.admin.inc:132
+msgid "If you don't want to load the included CSS file you can check this box."
+msgstr ""
+
+#: site_map.admin.inc:137
+msgid "Categories settings"
+msgstr ""
+
+#: site_map.admin.inc:141
+msgid "Show node counts by categories"
+msgstr ""
+
+#: site_map.admin.inc:143
+msgid "When enabled, this option will show the number of nodes in each taxonomy term."
+msgstr ""
+
+#: site_map.admin.inc:147
+msgid "Categories depth"
+msgstr ""
+
+#: site_map.admin.inc:151
+msgid "Specify how many subcategories should be included on the categorie page. Enter \"all\" to include all subcategories,\"0\" to include no subcategories, or \"-1\" not to append the depth at all."
+msgstr ""
+
+#: site_map.admin.inc:155
+msgid "Category count threshold"
+msgstr ""
+
+#: site_map.admin.inc:158
+msgid "Only show categories whose node counts are greater than this threshold. Set to -1 to disable"
+msgstr ""
+
+#: site_map.admin.inc:162
+msgid "Forum count threshold"
+msgstr ""
+
+#: site_map.admin.inc:165
+msgid "Only show forums whose node counts are greater than this threshold. Set to -1 to disable"
+msgstr ""
+
+#: site_map.admin.inc:170
+msgid "RSS settings"
+msgstr ""
+
+#: site_map.admin.inc:174
+msgid "RSS feed for front page"
+msgstr ""
+
+#: site_map.admin.inc:176
+msgid "The RSS feed for the front page, default is rss.xml."
+msgstr ""
+
+#: site_map.admin.inc:180
+msgid "Include RSS links"
+msgstr ""
+
+#: site_map.admin.inc:182
+msgid "None"
+msgstr ""
+
+#: site_map.admin.inc:182
+msgid "Include on the right side"
+msgstr ""
+
+#: site_map.admin.inc:182
+msgid "Include on the left side"
+msgstr ""
+
+#: site_map.admin.inc:183
+msgid "When enabled, this option will show links to the RSS feeds for each category and blog."
+msgstr ""
+
+#: site_map.admin.inc:187
+msgid "RSS feed depth"
+msgstr ""
+
+#: site_map.admin.inc:191
+msgid "Specify how many subcategories should be included in the RSS feed. Enter \"all\" to include all subcategories or \"0\" to include no subcategories."
+msgstr ""
+
+#: site_map.module:74
+msgid "Syndicate (site map)"
+msgstr ""
+
+#: site_map.module:79;87
+msgid "Syndicate"
+msgstr ""
+
+#: site_map.module:88
+msgid "more"
+msgstr ""
+
+#: site_map.module:88
+msgid "View the site map to see more RSS feeds."
+msgstr ""
+
+#: site_map.module:116
+msgid "Link to a content RSS feed"
+msgstr ""
+
+#: site_map.module:118
+msgid "Link to a comment RSS feed"
+msgstr ""
+
+#: site_map.module:190;190
+msgid "Syndicate content"
+msgstr ""
+
+#: site_map.module:193;193
+msgid "Syndicate comments"
+msgstr ""
+
+#: site_map.module:207
+msgid "Front page"
+msgstr ""
+
+#: site_map.module:208
+msgid "Front page of %sn"
+msgstr ""
+
+#: site_map.module:234
+msgid "Blogs"
+msgstr ""
+
+#: site_map.module:235
+msgid "Community blog and recent blog authors at %sn."
+msgstr ""
+
+#: site_map.module:237
+msgid "All blogs"
+msgstr ""
+
+#: site_map.module:259
+msgid "!s's blog"
+msgstr ""
+
+#: site_map.module:282
+msgid "Audio"
+msgstr ""
+
+#: site_map.module:283
+msgid "Audio content"
+msgstr ""
+
+#: site_map.module:304
+msgid "Video"
+msgstr ""
+
+#: site_map.module:305
+msgid "Video content"
+msgstr ""
+
+#: site_map.module:328
+msgid "Books"
+msgstr ""
+
+#: site_map.module:329
+msgid "Books at %sn."
+msgstr ""
+
+#: site_map.module:384
+msgid "Frequently Asked Questions"
+msgstr ""
+
+#: site_map.module:25
+msgid "access site map"
+msgstr ""
+
+#: site_map.module:50;59 site_map.info:0
+msgid "Site map"
+msgstr ""
+
+#: site_map.module:51
+msgid "Control what should be displayed on the site map."
+msgstr ""
+
+#: site_map.module:60
+msgid "Display a site map with RSS feeds."
+msgstr ""
+
+#: site_map.module:0
+msgid "site_map"
+msgstr ""
+
+#: site_map.info:0
+msgid "Display a site map."
+msgstr ""
+

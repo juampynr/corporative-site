@@ -1,0 +1,18 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the calendar module.
+ *
+ */
+
+function calendar_update_last_removed() {
+  return 6002;
+}
+
+/**
+ * Remove D6-style calendar legend block from block table.
+ */
+function calendar_update_7000() {
+  // Remove the former Calendar legend block, if any.
+  db_query("DELETE FROM {block} WHERE module = 'calendar' AND delta = '0'");
+}

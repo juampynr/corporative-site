@@ -1,0 +1,264 @@
+# Slovak translation of Site map (6.x-1.0)
+# Copyright (c) 2009 by the Slovak translation team
+# Generated from files:
+#  site_map.module,v 1.39.2.9 2008/11/08 18:57:33 frjo
+#  site_map.admin.inc,v 1.1.2.5 2008/10/22 11:16:04 frjo
+#  site_map.info,v 1.4 2007/09/26 14:13:37 frjo
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Site map (6.x-1.0)\n"
+"POT-Creation-Date: 2009-04-09 08:52+0200\n"
+"PO-Revision-Date: 2009-01-09 14:18+0100\n"
+"Language-Team: Slovak\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((n==1)?(0):(((n>=2)&&(n<=4))?(1):2));\n"
+
+#: site_map.module:293,174
+msgid "Syndicate content"
+msgstr "Syndikovať obsah"
+
+#: site_map.module:225,88
+msgid "more"
+msgstr "viac"
+
+#: site_map.module:322,204
+msgid "Blogs"
+msgstr "Blogy"
+
+#: site_map.module:372,251
+msgid "Books"
+msgstr "Knihy"
+
+#: site_map.module:216,87,79
+msgid "Syndicate"
+msgstr "Syndikovať"
+
+#: site_map.module:44; site_map.admin.inc:28
+msgid "For language %lang_name (code %lang_code)"
+msgstr "Pre jazyk %lang_name (kód %lang_code)"
+
+#: site_map.module:310,191
+msgid "Front page"
+msgstr "Titulná stránka"
+
+#: site_map.info:0; site_map.module:195,186,59,50
+msgid "Site map"
+msgstr "Mapa webu"
+
+#: site_map.module:54,38; site_map.admin.inc:38,22
+msgid "Site map message"
+msgstr "Správa mapy webu"
+
+#: site_map.module:58,39; site_map.admin.inc:42,23
+msgid "Define a message to be displayed above the site map."
+msgstr "Definujte správu, ktorá sa má zobraziť nad mapou webu."
+
+#: site_map.module:64; site_map.admin.inc:48
+msgid "Site map content"
+msgstr "Obsah mapy webu"
+
+#: site_map.module:68; site_map.admin.inc:52
+msgid "Show front page"
+msgstr "Zobraziť titulnú stránku"
+
+#: site_map.module:71; site_map.admin.inc:55
+msgid "When enabled, this option will include the front page in the site map."
+msgstr "Ak je zaškrtnuté, do mapy webu sa zahrnie titulná stránka."
+
+#: site_map.module:75; site_map.admin.inc:59
+msgid "Show active blog authors"
+msgstr "Zobraziť aktívnych autorov bogu"
+
+#: site_map.module:78; site_map.admin.inc:62
+msgid "When enabled, this option will show the 10 most active blog authors."
+msgstr "Ak je zaškrtnuté, zobrazí sa 10 najaktívnejších autorov blogu."
+
+#: site_map.module:89; site_map.admin.inc:72
+msgid "Books to include in the site map"
+msgstr "Knihy, ktoré majú byť zahrnuté v mape webu"
+
+#: site_map.module:124,103,93; site_map.admin.inc:122,100,89,76
+msgid ""
+"Ctrl-click (Windows) or Command-click (Mac) to select more than one "
+"value."
+msgstr ""
+"Viac hodnôt naraz označíte pomocou Ctrl-klik (Windows) alebo "
+"Command-klik (Mac)."
+
+#: site_map.admin.inc:85
+msgid "Menus to include in the site map for !lang (code !code)"
+msgstr ""
+"Menu, ktroé sa majú zahrnúť do mapy webu pre jazyk !lang (s kódom "
+"!code)"
+
+#: site_map.module:99; site_map.admin.inc:96
+msgid "Menus to include in the site map"
+msgstr "Menu, ktoré majú byť zahrnuté v mape webu"
+
+#: site_map.module:107; site_map.admin.inc:105
+msgid "Show FAQ content"
+msgstr "Zobraziť obsah FAQ"
+
+#: site_map.module:110; site_map.admin.inc:108
+msgid ""
+"When enabled, this option will include the content from the FAQ module "
+"in the site map."
+msgstr "Ak je zaškrtnuté, do mapy webu sa zahrnie obsah z modulu FAQ."
+
+#: site_map.module:120; site_map.admin.inc:118
+msgid "Categories to include in the site map"
+msgstr "Kategórie, ktoré majú byť zahrnuté v mape webu"
+
+#: site_map.module:129; site_map.admin.inc:127
+msgid "Categories settings"
+msgstr "Nastavenia kategórií"
+
+#: site_map.module:133; site_map.admin.inc:131
+msgid "Show books expanded"
+msgstr "Zobraziť knihy roztvorené"
+
+#: site_map.module:136; site_map.admin.inc:134
+msgid "When enabled, this option will show all children pages for each book."
+msgstr ""
+"Ak je zaškrtnuté, zobrazia sa všetky zviazané stránky každej "
+"knihy."
+
+#: site_map.module:140; site_map.admin.inc:138
+msgid "Show node counts by categories"
+msgstr "Zobraziť počet uzlov podľa kategórií"
+
+#: site_map.module:143; site_map.admin.inc:141
+msgid ""
+"When enabled, this option will show the number of nodes in each "
+"taxonomy term."
+msgstr ""
+"Ak je zaškrtnuté, zobrazí sa počet uzlov priradených termínu "
+"taxonómie."
+
+#: site_map.module:147; site_map.admin.inc:145
+msgid "Categories depth"
+msgstr "Hĺbka kategórií"
+
+#: site_map.module:151; site_map.admin.inc:149
+msgid ""
+"Specify how many subcategories should be included on the categorie "
+"page. Enter \"all\" to include all subcategories,\"0\" to include no "
+"subcategories, or \"-1\" not to append the depth at all."
+msgstr ""
+"Zadajte koľko podkategórií by malo byť zahrnutých zo stránky "
+"kategórie. Zadajte \"all\" ak chcete všetky podkategórie, \"0\" ak "
+"nechcete žiadnu podkategóriu, alebo \"-1\" ak nechcete pridať nič."
+
+#: site_map.module:156; site_map.admin.inc:154
+msgid "RSS settings"
+msgstr "Nastaveniea RSS"
+
+#: site_map.module:160; site_map.admin.inc:158
+msgid "Include RSS links"
+msgstr "Zahrnúť odkazy RSS"
+
+#: site_map.module:163; site_map.admin.inc:161
+msgid ""
+"When enabled, this option will show links to the RSS feeds for each "
+"category and blog."
+msgstr ""
+"Ak je zaškrtnuté, zobrazia sa odkazy kanála správ RSS pre každú "
+"kategóriu a blog."
+
+#: site_map.module:167; site_map.admin.inc:165
+msgid "RSS feed depth"
+msgstr "Hĺbka kanála správ RSS"
+
+#: site_map.module:171; site_map.admin.inc:169
+msgid ""
+"Specify how many subcategories should be included in the RSS feed. "
+"Enter \"all\" to include all subcategories or \"0\" to include no "
+"subcategories."
+msgstr ""
+"Zadajte koľko podkategórií by malo byť zahrnutých z RSS kanála "
+"správ. Zadajte \"all\" ak chcete všetky podkategórie, \"0\" ak "
+"nechcete žiadnu podkategóriu."
+
+#: site_map.module:211,74
+msgid "Syndicate (site map)"
+msgstr "Syndikovať (mapa webu)"
+
+#: site_map.module:225,88
+msgid "View the site map to see more RSS feeds."
+msgstr "Zobrazte mapu webu ak chete vidieť viacero RSS kanálov správ."
+
+#: site_map.module:247,110
+msgid "Link to a content RSS feed"
+msgstr "Toto je odkaz na RSS kanál obsahu"
+
+#: site_map.module:249,112
+msgid "Link to a comment RSS feed"
+msgstr "Toto je odkaz na RSS kanál komentárov"
+
+#: site_map.module:299,180
+msgid "Syndicate comments"
+msgstr "Syndikovať komentáre"
+
+#: site_map.module:311,192
+msgid "Front page of %sn"
+msgstr "Titulná stránka %sn"
+
+#: site_map.module:323,205
+msgid "Community blog and recent blog authors at %sn."
+msgstr "Blog komunity a blogy najaktívnejších autorov na %sn."
+
+#: site_map.module:326,208
+msgid "All blogs"
+msgstr "Všetky blogy"
+
+#: site_map.module:338,214
+msgid "!s's blog"
+msgstr "Blog používateľa !s"
+
+#: site_map.module:349,226
+msgid "Audio"
+msgstr "Audio"
+
+#: site_map.module:350,227
+msgid "Audio content"
+msgstr "Audionahrávka"
+
+#: site_map.module:359,237
+msgid "Video"
+msgstr "Video"
+
+#: site_map.module:360,238
+msgid "Video content"
+msgstr "Videonahrávka"
+
+#: site_map.module:373,252
+msgid "Books at %sn."
+msgstr "Knihy na %sn."
+
+#: site_map.module:409,307
+msgid "Frequently Asked Questions"
+msgstr "Často kladené otázky"
+
+#: site_map.module:25
+msgid "access site map"
+msgstr "prístup k mape webu"
+
+#: site_map.module:187,51
+msgid "Control what should be displayed on the site map."
+msgstr "Riadi čo by malo byť zobrazené na mape webu."
+
+#: site_map.module:196,60
+msgid "Display a site map with RSS feeds."
+msgstr "Zobrazí mapu webu spolu s RSS kanálmi správ."
+
+#: site_map.module:0
+msgid "site_map"
+msgstr "site_map"
+
+#: site_map.info:0
+msgid "Display a site map."
+msgstr "Zobrazí mapu webu."
+
