@@ -871,6 +871,10 @@ table.calendar-legend tr.even .stripe {
   width:auto;
 }
 
+.date-nav {
+  padding-bottom: 0;
+}
+
 ul.calendar-links,
 .region-content ul.calendar-links {
   margin:0;

@@ -169,7 +169,7 @@ function theme_date_part_label_time($vars) {
 
 /**
  * Theme for a date block that looks like a mini calendar day.
- * Pass in a date object already set to the right timezone, 
+ * Pass in a date object already set to the right timezone,
  * format as a calendar page date. The calendar styling is created in css.
  */
 function theme_date_calendar_day($vars) {
@@ -216,7 +216,7 @@ function theme_date_time_ago($vars) {
 
 /**
  *  Preprocessor to construct an ical vcalendar
- * 
+ *
  * @param $events
  *   An array of events where each event is an array keyed on the uid:
  *    'start'
@@ -233,7 +233,7 @@ function theme_date_time_ago($vars) {
  *      ID of the event for use by calendaring program, usually the url of the node
  *    'url'
  *      URL of event information
- * 
+ *
  *    'alarm'
  *      sub-array of alarm information for the event, including:
  *      - 'action' .- the action to take, either 'DISPLAY' .or 'EMAIL'
@@ -247,7 +247,7 @@ function theme_date_time_ago($vars) {
  *
  * @param $calname
  *   Name of the calendar.  Use site name if none is specified.
- * 
+ *
  */
 function template_preprocess_date_vcalendar(&$vars) {
 
@@ -267,7 +267,7 @@ function template_preprocess_date_vcalendar(&$vars) {
       $events[$uid] = $event;
       $timezone = timezone_name_get(date_timezone_get($event['start']));
       if (!empty($timezone)) {
-        $events[$uid]['timezone'] = "TZID=$timezone:";
+        $events[$uid]['timezone'] = "TZID=$timezone;";
       }
       else {
         $events[$uid]['timezone'] = '';
@@ -302,6 +302,6 @@ function template_preprocess_date_vcalendar(&$vars) {
     }
   }
 
-  $vars['events'] = $events;  
+  $vars['events'] = $events;
 }
 

@@ -6,8 +6,8 @@
  */
 /**
  * Settings for the default formatter.
- */ 
-function date_default_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {  
+ */
+function date_default_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
   $formatter = $display['type'];
@@ -20,20 +20,20 @@ function date_default_formatter_settings_form($field, $instance, $view_mode, $fo
     '#default_value' => $settings['format_type'],
     '#description' => t('To add or edit options, visit <a href="@date-time-page">Date and time settings</a>.', array('@date-time-page' => url('admin/config/regional/date-time'))),
     '#weight' => 0,
-  );      
+  );
 
   $form['fromto'] = array(
     '#title' => t('Display:'),
     '#type' => 'select',
     '#options' => array(
-      'both' => t('Both Start and End dates'), 
-      'value' => t('Start date only'), 
+      'both' => t('Both Start and End dates'),
+      'value' => t('Start date only'),
       'value2' => t('End date only'),
       ),
     '#access' => $field['settings']['todate'],
     '#default_value' => $settings['fromto'],
     '#weight' => 1,
-  );  
+  );
 
   // Make the string translatable by keeping it as a whole rather than
   // translating prefix and suffix separately.
@@ -77,7 +77,7 @@ function date_default_formatter_settings_form($field, $instance, $view_mode, $fo
     '#title' => t('Repeat rule:'),
     '#type' => 'select',
     '#options' => array(
-      'show' => t('Display repeat rule'), 
+      'show' => t('Display repeat rule'),
       'hide' => t('Hide repeat rule')),
     '#default_value' => $settings['show_repeat_rule'],
     '#access' => $field['settings']['repeat'],
@@ -103,45 +103,54 @@ function date_interval_formatter_settings_form($field, $instance, $view_mode, $f
     '#weight' => 0,
   );
   return $form;
-} 
+}
 
 /**
  * Settings summary for the default formatter.
  */
-function date_default_formatter_settings_summary($field, $instance, $view_mode) {  
+function date_default_formatter_settings_summary($field, $instance, $view_mode) {
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
   $formatter = $display['type'];
   $format_types = date_format_type_options();
   $summary = array();
+  switch($formatter) {
+    case 'date_plain':
+      $format = t('Plain');
+      break;
+    case 'format_interval':
+      $format = t('Interval');
+      break;
+    default:
+      $format = $format_types[$settings['format_type']];
+  }
+  $summary[] = t('Display dates using the @format format', array('@format' => $format));
 
-  $summary[] = t('Display dates using the @format format', array('@format' => $format_types[$settings['format_type']]));
-  
-  if ($field['settings']['todate']) {
+  if (array_key_exists('fromto', $settings) && $field['settings']['todate']) {
     $options = array(
-      'both' => t('Display both Start and End dates'), 
-      'value' => t('Display Start date only'), 
+      'both' => t('Display both Start and End dates'),
+      'value' => t('Display Start date only'),
       'value2' => t('Display End date only'),
     );
     $summary[] = $options[$settings['fromto']];
   }
 
-  if (!empty($field['cardinality'])) {
+  if (array_key_exists('multiple_number', $settings) && !empty($field['cardinality'])) {
     $summary[] = t('Show @count value(s) starting with @date1, ending with @date2', array(
-      '@count' => !empty($settings['multiple_number']) ? $settings['multiple_number'] : t('all'), 
-      '@date1' => !empty($settings['multiple_from']) ? $settings['multiple_from'] : t('earliest'), 
-      '@date2' => !empty($settings['multiple_to']) ? $settings['multiple_to'] : t('latest'), 
+      '@count' => !empty($settings['multiple_number']) ? $settings['multiple_number'] : t('all'),
+      '@date1' => !empty($settings['multiple_from']) ? $settings['multiple_from'] : t('earliest'),
+      '@date2' => !empty($settings['multiple_to']) ? $settings['multiple_to'] : t('latest'),
     ));
   }
 
-  if (!empty($field['repeat'])) {
+  if (array_key_exists('show_repeat_rule', $settings) && !empty($field['repeat'])) {
     if (!empty($settings['show_repeat_rule'])) {
       $summary[] = t('Show repeat rule');
     }
     else {
       $summary[] = t('Do not show repeat rule');
     }
-  }  
+  }
 
   return implode('<br />', $summary);
 }
@@ -150,7 +159,7 @@ function date_default_formatter_settings_summary($field, $instance, $view_mode) 
  * Settings summary for the interval formatter.
  * @TODO Add settings later.
  */
-function date_interval_formatter_settings_summary($field, $instance, $view_mode) {  
+function date_interval_formatter_settings_summary($field, $instance, $view_mode) {
   $summary = array();
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
@@ -165,7 +174,7 @@ function _date_field_instance_settings_form($field, $instance) {
   $widget_settings = $instance['widget']['settings'];
 
   $form['default_value'] = array(
-    '#type' => 'select', 
+    '#type' => 'select',
     '#title' => t('Default date'),
     '#default_value' => $settings['default_value'],
     '#options' => array('blank' => t('No default value'), 'now' => t('Now'), 'strtotime' => t('Relative')),
@@ -175,7 +184,7 @@ function _date_field_instance_settings_form($field, $instance) {
 
   $description = t("Describe a time by reference to the current day, like '+90 days' (90 days from the day the field is created) or '+1 Saturday' (the next Saturday). See !strtotime for more details.", array('!strtotime' => l(t('strtotime'), 'http://www.php.net/manual/en/function.strtotime.php')));
   $form['default_value_code'] = array(
-    '#type' => 'textfield', 
+    '#type' => 'textfield',
     '#title' => t('Relative default value'),
     '#description' => $description,
     '#default_value' => $settings['default_value_code'],
@@ -187,7 +196,7 @@ function _date_field_instance_settings_form($field, $instance) {
     '#fieldset' => 'default_values',
     );
   $form['default_value2'] = array(
-    '#type' => !empty($field['settings']['todate']) ? 'select' : 'hidden', 
+    '#type' => !empty($field['settings']['todate']) ? 'select' : 'hidden',
     '#title' => t('Default end date'),
     '#default_value' => $settings['default_value2'],
     '#options' => array('same' => t('Same as Default date'), 'blank' => t('No default value'), 'now' => t('Now'), 'strtotime' => t('Relative')),
@@ -195,7 +204,7 @@ function _date_field_instance_settings_form($field, $instance) {
     '#fieldset' => 'default_values',
     );
   $form['default_value_code2'] = array(
-    '#type' => !empty($field['settings']['todate']) ? 'textfield' : 'hidden', 
+    '#type' => !empty($field['settings']['todate']) ? 'textfield' : 'hidden',
     '#title' => t('Relative default value for end date'),
     '#description' => $description,
     '#default_value' => $settings['default_value_code2'],
@@ -256,6 +265,14 @@ function _date_field_widget_settings_form($field, $instance) {
     '#default_value' => $settings['input_format'],
     '#options' => $options,
     '#description' => t('Control the order and format of the options users see.'),
+    '#weight' => 3,
+    '#fieldset' => 'date_format',
+  );
+  $form['display_all_day'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display all day checkbox'),
+    '#default_value' => $settings['display_all_day'],
+    '#description' => t('Determines whether to display the \'All Day\' checkbox.'),
     '#weight' => 4,
     '#fieldset' => 'date_format',
   );
@@ -264,7 +281,7 @@ function _date_field_widget_settings_form($field, $instance) {
   if ($widget['type'] != 'date_popup') {
     $form['input_format']['#options']['custom'] = t('Custom format');
     $form['input_format_custom'] = array(
-      '#type' => 'textfield',  
+      '#type' => 'textfield',
       '#title' => t('Custom input format'),
       '#default_value' => $settings['input_format_custom'],
       '#description' => t("Override the input format selected above. Define a php date format string like 'm-d-Y H:i' (see <a href=\"@link\">http://php.net/date</a> for more details).", array('@link' => 'http://php.net/date')),
@@ -424,7 +441,7 @@ function _date_field_settings_form($field, $instance, $has_data) {
 
   // Make sure granularity is in the right format and has no empty values.
   if (!empty($settings['granularity']) && is_array($settings['granularity'])) {
-    $granularity = array_filter($settings['granularity']);  
+    $granularity = array_filter($settings['granularity']);
   }
   $tz_handling = $settings['tz_handling'];
 

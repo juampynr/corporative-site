@@ -26,4 +26,20 @@ function corporative_site_install() {
   ->condition('module', 'search', '=')
   ->condition('theme', 'bartik', '=')
   ->execute();
+
+  // Allow file uploads with CKeditor for Full HTML input filter
+  $result = db_select('ckeditor_settings', 's')
+    ->fields('s')
+    ->condition('name', 'Full', '=')
+    ->execute()
+    ->fetchAssoc();
+  $result['settings'] = unserialize($result['settings']);
+  $result['settings']['filebrowser'] = 'imce';
+  db_update('ckeditor_settings')->fields(
+    array(
+      'settings' => serialize($result['settings']),
+    )
+  )
+  ->condition('name', 'Full', '=')
+  ->execute();
 }

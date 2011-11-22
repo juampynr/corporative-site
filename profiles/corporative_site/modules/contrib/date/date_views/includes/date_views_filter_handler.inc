@@ -3,7 +3,7 @@
 /**
  * @file
  * A flexible, configurable date filter.
- * This filter combines multiple date filters into a single filter 
+ * This filter combines multiple date filters into a single filter
  * where all fields are controlled by the same date and can be combined with either AND or OR.
  */
 
@@ -33,7 +33,7 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
     $this->get_query_fields();
     if (!empty($this->query_fields)) {
 
-      // If we don't add a dummy where clause and there is no other filter defined for this view, 
+      // If we don't add a dummy where clause and there is no other filter defined for this view,
       // Views will dump in an invalid WHERE () in addition to our custom filters, so give it a valid value.
       // @TODO This is probably the wrong way to solve this problem.
       if (empty($this->query->where[$this->options['group']]['conditions'])) {
@@ -59,7 +59,7 @@ class date_views_filter_handler extends date_views_filter_handler_simple {
     $this->get_query_fields();
     if (!empty($this->query_fields)) {
 
-      // If we don't add a dummy where clause and there is no other filter defined for this view, 
+      // If we don't add a dummy where clause and there is no other filter defined for this view,
       // Views will dump in an invalid WHERE () in addition to our custom filters, so give it a valid value.
       // @TODO This is probably the wrong way to solve this problem.
       if (empty($this->query->where[$this->options['group']]['conditions'])) {

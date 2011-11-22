@@ -10,6 +10,7 @@ The links at the top of the calendar page have been reworked into tabs. They wil
 until you clear the caches. Use hook_calendar_links_alter() to alter the links or the titles 
 or to empty the links array if you don't want to see them.
 
+- Issue #1315328, Default calendar had date arguments in the master, which affected the upcoming view.
 - Issue #1268780 by drewkeller, $part_path in calendar_preprocess_date_views_pager() seems to be incorrect when base_path() is '/'
 - Issue #1235180 by marleythedog, Fix broken taxonomy stripe handling in calendar row plugin.
 - Issue #704068, Add OG stripe option to calendar row plugin.

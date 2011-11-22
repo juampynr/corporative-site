@@ -9,7 +9,7 @@ class twitter_views_handler_field_xss extends views_handler_field {
     $options['link_urls'] = array('default' => TRUE);
     $options['link_usernames'] = array('default' => TRUE);
     $options['link_hashtags'] = array('default' => FALSE);
-    $options['hashtags_url'] = array('default' => 'http://search.twitter.com/search?q=%23');
+    $options['hashtags_url'] = array('default' => TWITTER_SEARCH);
     return $options;
   }
 
@@ -33,7 +33,7 @@ class twitter_views_handler_field_xss extends views_handler_field {
     $form['hashtags_url'] = array(
       '#type' => 'textfield',
       '#default_value' => $this->options['hashtags_url'],
-      '#process' => array('views_process_dependency'),
+      '#process' => array('ctools_dependent_process'),
       '#dependency' => array('edit-options-link-hashtags' => array(TRUE)),
     );
   }
@@ -48,10 +48,9 @@ class twitter_views_handler_field_xss extends views_handler_field {
      $value = _filter_url($value, $filter);
     }
     if (!empty($this->options['link_usernames'])) {
-      $value = twitter_filter_link($value);
-    }
-    if (!empty($this->options['link_hashtags']) && valid_url($this->options['hashtags_url'])) {
-      $value = twitter_filter_link($value, '#', url($this->options['hashtags_url']));
+      $value = _twitter_filter_text($value, '@', TWITTER_HOMEPAGE); 
+    } if (!empty($this->options['link_hashtags']) && valid_url($this->options['hashtags_url'])) {
+      $value = _twitter_filter_text($value, '#', url($this->options['hashtags_url']));
     }
     return filter_xss($value);
   }

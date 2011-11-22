@@ -25,7 +25,7 @@ function twitter_admin_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => t('OAuth Settings'),
     '#access' => module_exists('oauth_common'),
-    '#description' => t('To enable OAuth based access for twitter, you must <a href="@url">register your application</a> with Twitter and add the provided keys here.', array('@url' => 'https://twitter.com/apps/new')),
+    '#description' => t('To enable OAuth based access for twitter, you must <a href="@url">register your application</a> with Twitter and add the provided keys here.', array('@url' => 'https://dev.twitter.com/apps/new')),
   );
   $form['oauth']['callback_url'] = array(
     '#type' => 'item',
@@ -118,10 +118,11 @@ function _twitter_account_list_row($account) {
     '#markup' => empty($account->protected) ? t('No') : t('Yes'),
   );
 
-  // Here we use user_access('import own tweets') to check permission instead
-  // of user_access('import own tweets', $account) is because we allow roles
-  // with sufficient permission to overwrite the user's import settings.
-  if (user_access('import own tweets')) {
+  // Here we use user_access('import own tweets') to check permission
+  // instead of user_access('import own tweets', $account->uid)
+  // because we allow roles with sufficient permission to overwrite
+  // the user's import settings.
+  if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
     $form['import'] = array(
       '#type' => 'checkbox',
       '#default_value' => user_access('import own tweets') ? $account->import : '',
@@ -142,9 +143,9 @@ function _twitter_account_list_row($account) {
 function theme_twitter_account_list_form($variables) {
   $form = $variables['form'];
 
-  if (user_access('import own tweets')) {
+  if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
     $header = array('', t('Name'), t('Description'), t('Private'), t('Import'), t('Delete'));
-  }
+  } 
   else {
     $header = array('', t('Name'), t('Description'), t('Private'), t('Delete'));
   }
@@ -157,7 +158,7 @@ function theme_twitter_account_list_form($variables) {
 
   foreach (element_children($form['accounts']) as $key) {
     $element = &$form['accounts'][$key];
-    if (user_access('import own tweets')) {
+    if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
       $row = array(
         drupal_render($element['image']),
         drupal_render($element['id']) . drupal_render($element['screen_name']) . drupal_render($element['visible_name']),
@@ -199,9 +200,11 @@ function twitter_account_list_form_submit($form, &$form_state) {
   foreach ($accounts as $account) {
     if (empty($account['delete'])) {
       twitter_account_save($account);
+      drupal_set_message(t('The Twitter account settings were updated.'));
     }
     else {
-      twitter_account_delete($account['id'], $account['screen_name']);
+      twitter_account_delete($account['id']);
+      drupal_set_message(t('The Twitter account was deleted.'));
     }
   }
 }
@@ -253,8 +256,11 @@ function twitter_user_make_global_submit($form, &$form_state) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Form to add a Twitter account
+ *
+ * If OAuth is not enabled, a text field lets users to add their
+ * Twitter screen name. If it is, a submit button redirects to
+ * Twitter.com asking for authorisation.
  */
 function twitter_account_form($form, $form_state, $account = NULL) {
   if (empty($account)) {
@@ -276,11 +282,6 @@ function twitter_account_form($form, $form_state, $account = NULL) {
       '#required' => TRUE,
       '#title' => t('Twitter user name'),
     );
-    $form['password'] = array(
-      '#type' => 'password',
-      '#title' => t('Password'),
-      '#description' => t("If your Twitter account is protected, or you wish to post to Twitter from Drupal, you must enter the Twitter account's password."),
-    );
 
     $form['import'] = array(
       '#type' => 'checkbox',
@@ -288,7 +289,6 @@ function twitter_account_form($form, $form_state, $account = NULL) {
       '#default_value' => TRUE,
       '#access' => FALSE,
     );
-
   }
 
   $form['submit'] = array(
@@ -300,48 +300,18 @@ function twitter_account_form($form, $form_state, $account = NULL) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Implements hook_FORM_ID_submit()
+ *
+ * Loads Twitter account details and adds them to the user account
  */
-function twitter_account_form_validate($form, &$form_state) {
+function twitter_account_form_submit($form, &$form_state) {
   module_load_include('lib.php', 'twitter');
   module_load_include('inc', 'twitter');
 
-  $verify = FALSE;
-
-  $pass = $form_state['values']['password'];
   $name = $form_state['values']['screen_name'];
-
-  if (!empty($pass)) {
-    $verify = TRUE;
-  }
-
-  $twitter = new Twitter($name, $pass);
-  if ($verify) {
-    $account = $twitter->verify_credentials();
-    if (!$account) {
-      form_set_error("password", t('Twitter authentication failed. Please check your account name and try again.'));
-    }
-  }
-  else {
-    // if we're not verify credentials, simply load the user data, without oauth
-    $account = $twitter->users_show($name, false);
-  }
-  $form_state['twitter_account'] = $account;
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function twitter_account_form_submit($form, &$form_state) {
-  module_load_include('inc', 'twitter');
-
-  if (!empty($form_state['values']['screen_name'])) {
-    $account = $form_state['twitter_account'];
-    $account->set_auth($form_state['values']);
-    twitter_account_save($account, TRUE);
-  }
+  $twitter = new Twitter($name);
+  $account = $twitter->users_show($name, false);
+  twitter_account_save($account, TRUE, user_load($form_state['values']['uid']));
 }
 
 /**

@@ -1,7 +1,7 @@
 Drupal date_popup.module README.txt
 ==============================================================================
 
-Javascript popup calendar and timeentry using the 
+Javascript popup calendar and timeentry using the
 jquery UI calendar and a choice of jquery-timeentry libraries.
 
 ==================================================================================
@@ -24,14 +24,14 @@ The options are:
 
 1) Manual time entry - a plain textfield where users can type in the time.
 2) A 'default' jQuery timepicker, included in the code (http://keith-wood.name/timeEntry.html).
-3) The wvega timepicker (https://github.com/wvega/timepicker). 
+3) The wvega timepicker (https://github.com/wvega/timepicker).
 
 To install the alternate dropdown (wvega) timepicker:
 
-Create a 'sites/all/libraries/wvega-timepicker' directory in your site installation. 
-Then visit https://github.com/wvega/timepicker/archives/master, download the latest copy 
-and unzip it. You will see files with names like jquery.timepicker-1.1.2.js and 
-jquery.timepicker-1.1.2.css. Rename them to jquery.timepicker.js and jquery.timepicker.css 
+Create a 'sites/all/libraries/wvega-timepicker' directory in your site installation.
+Then visit https://github.com/wvega/timepicker/archives/master, download the latest copy
+and unzip it. You will see files with names like jquery.timepicker-1.1.2.js and
+jquery.timepicker-1.1.2.css. Rename them to jquery.timepicker.js and jquery.timepicker.css
 and copy them into 'sites/all/libraries/wvega-timepicker'.
 
 ==================================================================================
@@ -62,16 +62,16 @@ Customization
 ==================================================================================
 
 To change the default display and functionality of the calendar, set startup
-parameters by adding selectors to your element. The configurable options 
+parameters by adding selectors to your element. The configurable options
 are:
 
 #date_type
   The type of date to convert the input value to, DATE_DATETIME, DATE_ISO, or DATE_UNIX
 
 #date_format
-  a standard PHP date format string that represents the way the month, day, 
-  and year will be displayed in the textfield, like m/d/Y. Months and days 
-  must be in the 'm' and 'd' formats that include the zero prefix, the year 
+  a standard PHP date format string that represents the way the month, day,
+  and year will be displayed in the textfield, like m/d/Y. Months and days
+  must be in the 'm' and 'd' formats that include the zero prefix, the year
   must be in the 'Y' (four digit) format.
 
   Any standard separator can be used, '/', '-', '.', or a space.
@@ -83,7 +83,7 @@ are:
   The default format uses the short site default format.
 
 #date_year_range
-  the number of years to go backwards and forwards from current year 
+  the number of years to go backwards and forwards from current year
   in year selector, in the format -{years back}:+{years forward},
   like -3:+3
 

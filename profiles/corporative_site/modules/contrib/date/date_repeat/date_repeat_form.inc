@@ -34,8 +34,16 @@
  * Generate the repeat setting form.
  */
 function _date_repeat_rrule_process($element, &$form_state, $form) {
-  module_load_include('inc', 'date_api', 'date_api_ical');
 
+  // If the RRULE field is not visible to the user, needs no processing or validation.
+  // The Date field module is not adding this element to forms if the field is hidden,
+  // this test is just in case some other module attempts to do so.
+
+  if (date_hidden_element($element)) {
+    return $element;
+  }
+
+  module_load_include('inc', 'date_api', 'date_api_ical');
   if (empty($element['#date_repeat_widget'])) {
     $element['#date_repeat_widget'] = module_exists('date_popup') ? 'date_popup' : 'date_select';
   }
@@ -165,7 +173,7 @@ function _date_repeat_rrule_process($element, &$form_state, $form) {
   else {
     $collapsed = FALSE;
   }
- 
+
   $element['exceptions'] = array(
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
@@ -174,7 +182,7 @@ function _date_repeat_rrule_process($element, &$form_state, $form) {
     '#description' => t('Dates to omit from the list of repeating dates.'),
     '#prefix' => '<div id="date-repeat-exceptions-' . $instance . '" class="date-repeat">',
     '#suffix' => '</div>',
-    );  
+    );
   for ($i = 0; $i < max($form_state['num_exceptions'][$instance], 1) ; $i++) {
     $EXCEPT = '';
     if (!empty($exceptions[$i]['datetime'])) {
@@ -256,7 +264,7 @@ function _date_repeat_rrule_process($element, &$form_state, $form) {
       'callback' => 'date_repeat_add_exception_callback',
       'wrapper' => 'date-repeat-exceptions-' . $instance,
     ),
-  ); 
+  );
   $element['additions']['additions_add'] = array(
     '#type' => 'submit',
     '#name' => 'additions_add|' . $instance,
@@ -267,7 +275,7 @@ function _date_repeat_rrule_process($element, &$form_state, $form) {
       'callback' => 'date_repeat_add_addition_callback',
       'wrapper' => 'date-repeat-additions-' . $instance,
     ),
-  ); 
+  );
 
   $element['#date_repeat_collapsed'] = !empty($rrule['INTERVAL']) || !empty($rrule['FREQ']) ? 0 : (!empty($element['#date_repeat_collapsed']) ? $element['#date_repeat_collapsed'] : 0);
   return $element;
@@ -317,9 +325,9 @@ function date_repeat_merge($form_values, $element) {
     unset($form_values['exceptions']);
     unset($form_values['additions']);
   }
-  if (array_key_exists('BYDAY', $form_values)) unset($form_values['BYDAY']['']);
-  if (array_key_exists('BYMONTH', $form_values)) unset($form_values['BYMONTH']['']);
-  if (array_key_exists('BYMONTHDAY', $form_values)) unset($form_values['BYMONTHDAY']['']);
+  if (array_key_exists('BYDAY', $form_values) && is_array($form_values['BYDAY'])) unset($form_values['BYDAY']['']);
+  if (array_key_exists('BYMONTH', $form_values) && is_array($form_values['BYMONTH'])) unset($form_values['BYMONTH']['']);
+  if (array_key_exists('BYMONTHDAY', $form_values) && is_array($form_values['BYMONTHDAY'])) unset($form_values['BYMONTHDAY']['']);
 
   if (array_key_exists('UNTIL', $form_values) && is_array($form_values['UNTIL']['datetime'])) {
     $function = $element['#date_repeat_widget'] . '_input_date';
@@ -356,13 +364,14 @@ function date_repeat_merge($form_values, $element) {
  * Build a RRULE out of the form values.
  */
 function date_repeat_rrule_validate($element, &$form_state) {
+
+  if (date_hidden_element($element)) {
+    return;
+  }
+
   module_load_include('inc', 'date_api', 'date_api_ical');
 
-  $form_values = $form_state['values'];
-  $item = $form_values;
-  foreach ($element['#parents'] as $key) {
-    $item = $item[$key];
-  }
+  $item = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
   $item = date_repeat_merge($item, $element);
   if (!empty($item['UNTIL']['datetime']) && is_object($item['UNTIL']['datetime'])) {
     $item['UNTIL']['datetime']->setTime(23, 59, 59);
@@ -398,7 +407,7 @@ function theme_date_repeat_current_additions($rows = array()) {
     }
   }
   return theme('table', array('header' => array(t('Delete'), t('Current additions')), 'rows' => $rows_info));
-} 
+}
 
 /**
  * Wrapper fieldset for repeat rule.

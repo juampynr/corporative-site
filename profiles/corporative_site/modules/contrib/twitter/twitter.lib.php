@@ -27,7 +27,7 @@ class Twitter {
   /**
    * @var $host The host to query against
    */
-  protected $host = 'twitter.com';
+  protected $host;
 
   /**
    * @var $source the twitter api 'source'
@@ -51,6 +51,7 @@ class Twitter {
     if (!empty($username) && !empty($password)) {
       $this->set_auth($username, $password);
     }
+    $this->host = variable_get('twitter_host', 'api.twitter.com');
   }
 
   /**
@@ -69,6 +70,20 @@ class Twitter {
    */
   public function set_host($host) {
     $this->host = $host;
+    variable_set('twitter_host', 'api.twitter.com');
+  }
+
+  /**
+   * Get the Twitter API host URL
+   *
+   * @return
+   *   string with the host URL.
+   */
+  public function get_host() {
+    if ($this->host == '') {
+      $this->host = variable_get('twitter_host', 'api.twitter.com');
+    }
+    return $this->host;
   }
 
   /**
@@ -194,6 +209,7 @@ class Twitter {
       }
     }
     catch (TwitterException $e) {
+      watchdog('twitter', '!message', array('!message' => $e->__toString()), WATCHDOG_ERROR);
       return FALSE;
     }
 
@@ -243,7 +259,7 @@ class Twitter {
     else {
       $error = $response->error;
       $data = $this->parse_response($response->data);
-      if ($data['error']) {
+      if (isset($data['error'])) {
         $error = $data['error'];
       }
       throw new TwitterException($error);
@@ -269,7 +285,7 @@ class Twitter {
       $format = $this->format;
     }
 
-    $url =  'http://'. $this->host .'/'. $path;
+    $url =  'http://' . $this->get_host() . '/'. $path;
     if (!empty($format)) {
       $url .= '.'. $this->format;
     }
@@ -349,7 +365,14 @@ class TwitterOAuth extends Twitter {
 
 class TwitterSearch extends Twitter {
 
-  protected $host = 'search.twitter.com';
+  protected $host;
+
+  /**
+   * Constructor for the Twitter class
+   */
+  public function __construct() {
+    $this->host = variable_get('twitter_search_host', 'search.twitter.com');
+  }
 
   public function search($params = array()) {
 
@@ -484,7 +507,7 @@ class TwitterUser {
     if ($values['created_at'] && $created_time = strtotime($values['created_at'])) {
       $this->created_time = $created_time;
     }
-    $this->utc_offset = $values['utc_offset'];
+    $this->utc_offset = $values['utc_offset']?$values['utc_offset']:0;
 
     if (isset($values['status'])) {
       $this->status = new TwitterStatus($values['status']);
@@ -496,10 +519,7 @@ class TwitterUser {
   }
 
   public function set_auth($values) {
-    if ( isset($values['password']) ) {
-      $this->password = $values['password'];
-    }
-    $this->oauth_token = $values['oauth_token'];
-    $this->oauth_token_secret = $values['oauth_token_secret'];
+    $this->oauth_token = isset($values['oauth_token'])?$values['oauth_token']:NULL;
+    $this->oauth_token_secret = isset($values['oauth_token_secret'])?$values['oauth_token_secret']:NULL;
   }
 }

@@ -28,6 +28,62 @@ function twitter_views_data() {
     'weight' => 10,
   );
 
+  // Tweet ID
+  $data['twitter']['twitter_id'] = array(
+    'title' => t('Twitter status message ID'),
+    'help' => t('The ID of the Twitter status message.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Twitter reply-to-status id
+  $data['twitter']['in_reply_to_status_id'] = array(
+    'title' => t('In reply to status ID'),
+    'help' => t('The ID of the Twitter status this message is replying to.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Twitter reply-to-status screen name
+  $data['twitter']['in_reply_to_screen_name'] = array(
+    'title' => t('In reply to user name'),
+    'help' => t('The login account of the Twitter user this message is replying to.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   // Twitter screen name
   $data['twitter']['screen_name'] = array(
     'title' => t('Login name'),

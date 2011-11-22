@@ -8,30 +8,30 @@ function date_field_schema($field) {
   switch ($field['type']) {
     case 'datestamp':
       $db_columns['value'] = array(
-        'type' => 'int', 
-        'not null' => FALSE, 
-        'sortable' => TRUE, 
+        'type' => 'int',
+        'not null' => FALSE,
+        'sortable' => TRUE,
         'views' => TRUE,
       );
       break;
     case 'datetime':
       $db_columns['value'] = array(
         'type' => 'datetime',
-        'mysql_type' => 'DATETIME',
-        'pgsql_type' => 'timestamp without time zone', 
-        'sqlite_type' => 'VARCHAR', 
+        'mysql_type' => 'datetime',
+        'pgsql_type' => 'timestamp without time zone',
+        'sqlite_type' => 'varchar',
         'sqlsrv_type' => 'smalldatetime',
-        'not null' => FALSE, 
-        'sortable' => TRUE, 
+        'not null' => FALSE,
+        'sortable' => TRUE,
         'views' => TRUE,
       );
       break;
     default:
       $db_columns['value'] = array(
-        'type' => 'varchar', 
-        'length' => 20, 
-        'not null' => FALSE, 
-        'sortable' => TRUE, 
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => FALSE,
+        'sortable' => TRUE,
         'views' => TRUE,
       );
       break;
@@ -48,29 +48,29 @@ function date_field_schema($field) {
   // timezone and offset columns are used only if date-specific dates are chosen.
   if (isset($field['settings']['tz_handling']) && $field['settings']['tz_handling'] == 'date') {
     $db_columns['timezone'] = array(
-      'type' => 'varchar', 
-      'length' => 50, 
-      'not null' => FALSE, 
-      'sortable' => TRUE, 
+      'type' => 'varchar',
+      'length' => 50,
+      'not null' => FALSE,
+      'sortable' => TRUE,
       'views' => FALSE,
     );
     $db_columns['offset'] = array(
-      'type' => 'int', 
-      'not null' => FALSE, 
-      'sortable' => TRUE, 
+      'type' => 'int',
+      'not null' => FALSE,
+      'sortable' => TRUE,
       'views' => FALSE,
     );
     if (!empty($field['settings']['todate'])) $db_columns['offset2'] = array('type' => 'int', 'not null' => FALSE, 'sortable' => TRUE, 'views' => FALSE);
   }
   if (isset($field['settings']['repeat']) && $field['settings']['repeat'] == 1) {
     $db_columns['rrule'] = array(
-      'type' => 'text', 
-      'not null' => FALSE, 
-      'sortable' => FALSE, 
+      'type' => 'text',
+      'not null' => FALSE,
+      'sortable' => FALSE,
       'views' => FALSE,
     );
   }
-  return array('columns' => $db_columns);  
+  return array('columns' => $db_columns);
 }
 
 function date_update_last_removed() {
@@ -106,7 +106,7 @@ function date_update_7000() {
 
 /**
  * Get rid of the separate widgets for repeating dates. The code now handles
- * repeating dates correctly using the regular widgets. 
+ * repeating dates correctly using the regular widgets.
  */
 function date_update_7001() {
   $query = db_select('field_config_instance', 'fci', array('fetch' => PDO::FETCH_ASSOC));

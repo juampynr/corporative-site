@@ -68,6 +68,27 @@ function _views_slideshow_cycle_preprocess_views_slideshow_cycle_main_frame(&$va
     $vss_id .= '-' . $slideshow_count;
     $settings['vss_id'] = $vss_id;
   }
+  
+  // Don't load javascript unless libraries module is present.
+  if (module_exists('libraries')) {
+    // Load jQuery Cycle
+    if ($cycle_path = _views_slideshow_cycle_library_path()) {
+      drupal_add_js($cycle_path);
+    }
+
+    // Load Json2
+    $json_path = libraries_get_path('json2');
+    if (!empty($json_path) && file_exists($json_path . '/json2.js')) {
+      drupal_add_js($json_path . '/json2.js');
+    }
+
+    // Load our cycle js
+    $module_path = drupal_get_path('module', 'views_slideshow_cycle');
+    drupal_add_js($module_path . '/js/views_slideshow_cycle.js');
+  }
+
+  // Load our cycle css
+  drupal_add_css($module_path . '/views_slideshow_cycle.css', 'file');
 
   drupal_add_js(array('viewsSlideshowCycle' => array('#views_slideshow_cycle_main_' . $vss_id => $settings)), 'setting');
   
@@ -114,7 +135,7 @@ function _views_slideshow_cycle_preprocess_views_slideshow_cycle_main_frame(&$va
   foreach ($rows as $count => $item) {
     $items[] = $item;
     if (count($items) == $items_per_slide || $count == (count($rows)-1)) {
-      $rendered_rows .= theme('views_slideshow_cycle_main_frame_row', array('vss_id' => $vss_id, 'items' => $items, 'count' => $slideshow_count));
+      $rendered_rows .= theme('views_slideshow_cycle_main_frame_row', array('vss_id' => $vss_id, 'items' => $items, 'count' => $slideshow_count, 'view' => $vars['view']));
       $items = array();
       $slideshow_count++;
     }
@@ -140,7 +161,7 @@ function _views_slideshow_cycle_preprocess_views_slideshow_cycle_main_frame_row(
 
   $vars['rendered_items'] = '';
   foreach ($vars['items'] as $item_count => $item) {
-    $vars['rendered_items'] .= theme('views_slideshow_cycle_main_frame_row_item', array('item' => $item, 'item_count' => $item_count));
+    $vars['rendered_items'] .= theme('views_slideshow_cycle_main_frame_row_item', array('item' => $item, 'item_count' => $item_count, 'view' => $vars['view']));
   }
 }
 
@@ -154,5 +175,12 @@ function _views_slideshow_cycle_preprocess_views_slideshow_cycle_main_frame_row_
   }
   else {
     $vars['classes_array'][] = 'views-row-odd';
+  }
+  
+  /**
+   * Support custom row classes.
+   */
+  if ($row_class = $vars['view']->style_plugin->get_row_class($vars['item_count'])) {
+    $vars['classes_array'][] = $row_class;
   }
 }

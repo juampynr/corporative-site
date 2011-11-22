@@ -18,6 +18,7 @@ function views_slideshow_views_plugins() {
         'uses options' => TRUE,
         'uses row plugin' => TRUE,
         'uses grouping' => FALSE,
+        'uses row class' => TRUE,
         'type' => 'normal',
         'parent' => 'list',
         'path' => drupal_get_path('module', 'views_slideshow'),

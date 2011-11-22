@@ -21,8 +21,8 @@ class DateTimezoneTestCase extends DateFieldBasic {
           $label = 'Test';
           $granularity = date_granularity_array_from_precision($max_granularity);
           $options = array(
-            'label' => $label, 
-            'widget_type' => 'date_text', 
+            'label' => $label,
+            'widget_type' => 'date_text',
             'field_name' => $field_name,
             'field_type' => $field_type,
             'input_format' => 'custom',

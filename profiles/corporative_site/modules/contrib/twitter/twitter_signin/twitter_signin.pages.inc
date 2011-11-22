@@ -9,12 +9,12 @@ function twitter_signin_admin_settings($form, &$form_state) {
 
   $img_path = drupal_get_path('module', 'twitter_signin') . '/images';
   $results = file_scan_directory($img_path, '/.png/');
-  
+
   $options = array();
   foreach ($results as $image) {
-    $options[$image->basename] = theme('image', array('path' => $image->filename));
+    $options[$image->filename] = theme('image', array('path' => $image->uri));
   }
-  
+
   $form['twitter_signin_button'] = array(
     '#type' =>  'radios',
     '#title' => t('Select sign-in button'),

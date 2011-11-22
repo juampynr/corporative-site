@@ -1,6 +1,5 @@
-
 name = Nombre proyecto
-description = Theme personalizado para ..., creado por ideup!
+description = Tema personalizado para ..., creado por ideup!
 version = 1.0
 core = 7.x
 
@@ -45,15 +44,14 @@ regions[page_bottom] = Page bottom
 ; CONTEXT LAYOUTS
 ; ***************************************************************************
 
-; Layout: Left sidebar (default)
-	layouts[default][name] = "Left sidebar (default)"
-	layouts[default][description] = "Content with left sidebar"
-	layouts[default][template] = "page"
-	layouts[default][regions][] = "page_top"
-	layouts[default][regions][] = "header"
-	layouts[default][regions][] = "help"
-	layouts[default][regions][] = "highlighted"
-	layouts[default][regions][] = "sidebar_first"
-	layouts[default][regions][] = "content"
-	layouts[default][regions][] = "footer"
-	layouts[default][regions][] = "page_bottom"
+layouts[default][name] = "Left sidebar (default)"
+layouts[default][description] = "Content with left sidebar"
+layouts[default][template] = "page"
+layouts[default][regions][] = "page_top"
+layouts[default][regions][] = "header"
+layouts[default][regions][] = "help"
+layouts[default][regions][] = "highlighted"
+layouts[default][regions][] = "sidebar_first"
+layouts[default][regions][] = "content"
+layouts[default][regions][] = "footer"
+layouts[default][regions][] = "page_bottom"

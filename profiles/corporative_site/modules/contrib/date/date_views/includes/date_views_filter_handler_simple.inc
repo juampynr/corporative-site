@@ -46,7 +46,9 @@ class date_views_filter_handler_simple extends views_handler_filter_date {
     // If this is a remembered value, use the value from the SESSION.
     if (!empty($this->options['expose']['remember'])) {
       $display_id = ($this->view->display_handler->is_defaulted('filters')) ? 'default' : $this->view->current_display;
-      return $_SESSION['views'][$this->view->name][$display_id]['date_filter'][$prefix];
+      if (!empty($_SESSION['views'][$this->view->name][$display_id]['date_filter'][$prefix])) {
+        return $_SESSION['views'][$this->view->name][$display_id]['date_filter'][$prefix];
+      }
     }
 
     // This is a date that needs to be constructed from options like 'now' .
@@ -278,7 +280,7 @@ class date_views_filter_handler_simple extends views_handler_filter_date {
         $relative_label = t('Relative end date');
         break;
       default:
-        $label = t('Date value');
+        $label = '';
         $relative_label = t('Relative date');
         break;
     }

@@ -143,7 +143,7 @@ function twitter_fetch_user_timeline($id) {
 }
 
 /**
- * Delete a user from {twitter_account}.
+ * Delete a twitter account and its statuses.
  *
  * @param $twitter_uid
  *   An integer with the Twitter UID.
@@ -151,11 +151,22 @@ function twitter_fetch_user_timeline($id) {
  * @param $screen_name
  *   Optional string with the user name.
  */
-function twitter_account_delete($twitter_uid, $screen_name = NULL) {
+function twitter_account_delete($twitter_uid) {
+  $account = twitter_account_load($twitter_uid);
+
+  // Delete from {twitter_account}.
   $query = db_delete('twitter_account');
-  $query->condition('twitter_uid', $twitter_uid);
-  if (!empty($screen_name)) {
-    $query->condition('screen_name', $screen_name);
-  }
+  $query->conditions('twitter_uid', $twitter_uid);
+  $query->execute();
+
+  // Delete from {twitter}.
+  $query = db_delete('twitter');
+  $query->conditions('screen_name', $account->screen_name);
+  $query->execute();
+
+  // Delete from {twitter_account}.
+  $query = db_delete('authmap');
+  $query->conditions('authname', $twitter_uid);
+  $query->conditions('module', 'twitter');
   $query->execute();
 }

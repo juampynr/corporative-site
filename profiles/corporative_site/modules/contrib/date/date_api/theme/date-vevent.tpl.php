@@ -3,7 +3,7 @@
 /**
  * $event
  *   An array with the following information about each event:
- * 
+ *
  *   $event['uid'] - a unique id for the event (usually the url).
  *   $event['summary'] - the name of the event.
  *   $event['start'] - the formatted start date of the event.

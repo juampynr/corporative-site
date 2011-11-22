@@ -8,7 +8,7 @@ class DateValidationTestCase extends DateFieldBasic {
     );
   }
 
-  public function testValidation() {    
+  public function testValidation() {
 
     // Attempts to create text date field stored as a date with default settings (from input which is not valid).
 
@@ -20,7 +20,7 @@ class DateValidationTestCase extends DateFieldBasic {
           'label' => $label,
           'field_name' => $field_name,
           'field_type' => $field_type,
-          'widget_type' => $widget_type, 
+          'widget_type' => $widget_type,
           'input_format' => 'm/d/Y - H:i',
         );
         $this->createDateField($options);

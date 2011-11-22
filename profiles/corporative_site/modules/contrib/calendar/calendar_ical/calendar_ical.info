@@ -14,9 +14,9 @@ files[] = calendar-style-ical.tpl.php
 files[] = calendar-row-ical-node.tpl.php
 files[] = theme.inc
 
-; Information added by drupal.org packaging script on 2011-10-07
+; Information added by drupal.org packaging script on 2011-11-19
 version = "7.x-3.x-dev"
 core = "7.x"
 project = "calendar"
-datestamp = "1317989044"
+datestamp = "1321704196"
 

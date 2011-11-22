@@ -130,7 +130,7 @@ function date_api_uninstall() {
 
   if (db_table_exists('views_display')) {
     $displays = array(
-      'date_nav', 
+      'date_nav',
     );
     db_query("DELETE FROM {views_display} WHERE display_plugin IN ('" . implode("','", $displays) . "')");
     db_query("DELETE FROM {cache_views}");
@@ -143,7 +143,7 @@ function date_api_update_last_removed() {
 
 /**
  * Move old date format data to new date format tables, and delete the old tables.
- * Insert only values that don't already exist in the new tables, 
+ * Insert only values that don't already exist in the new tables,
  * in case new version of those custom values have already been created.
  */
 function date_api_update_7000() {
@@ -170,7 +170,7 @@ function date_api_update_7000() {
         ->execute()->fetchField();
 
       // If the value is missing, insert it.
-      // Do nothing if it already exists, assume the value in the 
+      // Do nothing if it already exists, assume the value in the
       // new table trumps the old values.
       if (empty($count)) {
         db_insert('date_format_type')
@@ -185,11 +185,11 @@ function date_api_update_7000() {
 
     // Drop the old table.
     db_drop_table('date_format_types');
- 
+
   }
 
   // Move format data from the old 'date_formats' table
-  // (which was renamed to 'd6_date_formats') 
+  // (which was renamed to 'd6_date_formats')
   // to the new 'date_formats' table.
 
   if (db_table_exists('d6_date_formats')) {
@@ -212,7 +212,7 @@ function date_api_update_7000() {
         ->execute()->fetchField();
 
       // If the value is missing, insert it.
-      // Do nothing if it already exists, assume the value in the 
+      // Do nothing if it already exists, assume the value in the
       // new table trumps the old values.
       if (empty($count)) {
         db_insert('date_formats')
@@ -230,7 +230,7 @@ function date_api_update_7000() {
   }
 
   // Move format data from the old 'date_format_locale' table
-  // (which was renamed to 'd6_date_format_locale') 
+  // (which was renamed to 'd6_date_format_locale')
   // to the new 'date_format_locale' table.
 
   if (db_table_exists('d6_date_format_locale')) {
@@ -254,7 +254,7 @@ function date_api_update_7000() {
         ->execute()->fetchField();
 
       // If the value is missing, insert it.
-      // Do nothing if it already exists, assume the value in the 
+      // Do nothing if it already exists, assume the value in the
       // new table trumps the old values.
       if (empty($count)) {
         db_insert('date_format_locale')

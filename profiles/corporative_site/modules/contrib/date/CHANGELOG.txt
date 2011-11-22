@@ -12,6 +12,8 @@ is now controlled by a field setting.
 
 New Features/UX Changes/API Changes
 
+- Issue #1038482 by somanyfish, iCal import failing due to colon instead of semi-colon
+- Issue #1252952 by eosrei: Make "all day" checkbox configurable on a per field instance basis.
 - Issue #1266144 by arlinsandbulte: Clarify Default End Date Setting
 - Issue #1261478 by stevector and KarenS, Reconfigure the back/next buttons into item lists so Views ajax pager works right.
 - Issue #1262960, Add a new module to work with the Context module to set a condition based on the value of a date field.
@@ -19,6 +21,44 @@ New Features/UX Changes/API Changes
 
 Bugfixes
 
+- Issue #1278876 by basicmagic.net, Typo in date.css
+- Issue #752550 by Fonant, Week number gets printed twice
+- Issue #1052586 by jpsolero, Problem with Date API when using Calendar with argument set to "Week" granularity and "current date" default argument
+- Issue #1266144, End date same as start date default not being respected.
+- Issue #1239934 by casey, Fix javascript exception in date_year_range.js.
+- Issue #1310558, Don't show extra label on exposed date filter.
+- Fix bug in Date Popup that still uses the current date when the default date is empty.
+- Issue #1335578 by aaronbauman, Make it possible to pass in +/- 1000 years to years back/forward.
+- Issue #1292516 by mcarbone, Fix Uninitialized string offset in Date Migrate.
+- Issue #1084980 by jwilson3, Set default value for $granularity to be array in date_formatter_format.
+- Issue #1227350 by grendzy, Summary view should not be calling date_forbid().
+- Issue #1286570, Fix undefined index error caused by using a remember value without checking if it exists.
+- Issue #1337440 by phoenix, Fix syntax error in vcalendar tpl file.
+- Issue #1103032, Add plain date formatter and set it to be the default token formatter.
+- Issue #1177684 by tim.plunket, Fix typo in last commit.
+- Issue #1177684, Wrong translation of short month name.
+- Issue #1201342 by colinlee and alexprv, Comment out SQLSVR timezone adjustment until it gets fixed properly.
+- Issue #1308274 by sneyerst, SQL Server DATEPART function cannot accept composed datetime formats.
+- Issue #1308266 by sneyerst, Fix arithmetic overflow in SQLSVR.
+- Issue #1333104 by tim.plunkett, Check that $field['settings'] exists in date_is_repeat_field().
+- Error message for years back and forward doesn't match new labels, should be Starting year and Ending year.
+- Issue #1179715, Switch drupal_array_get_nested_value() to use 'values' instead of 'input', where it makes sense, and simplify some of this code.
+- Issue #1179715, Create a helper function for testing hidden/disabled dates and test each date element and validator to skip processing in that case.
+- Issue #1179715, When hidden by #access=FALSE, repeating date fields were getting removed and not replaced.
+- Issue #1179715, By pass date repeat widget processing and validation when element is hidden from user.
+- Issue #1179715, Don't do timezone adjustments in the widget, wait for #process so we can skip it when the date field has been hidden by #access.
+- Issue #1338194, Logic for creating end date wasn't taking into account the possibility that a field might have no value2.
+- Issue #1179715, Default value callback for the timezone widget was not returning an array.
+- Issue #1179716, Remove value_callback for date_repeat and date_combo forms, the default behavior works fine.
+- Issue #1178716 by das-peter, Use drupal_array_get_nested_value() in Date Repeat instead of trying to find it manually.
+- Issue #1178716 by das-peter and KarenS, Tweak the date repeat widget to identify empty input when used on nodes with translation. 
+- Issue #1178716 by das-peter and KarenS, Fix date repeat form values that are not arrays when hidden on a node that has translation.
+- Issue #1178176 by das-peter, Fix date_combo_value_callback to return NULL to avoid data lost on untranslatable dates used with Entity Translation.
+- Date Context module was making incorrect assumptions about the $language of the field.
+- Issue #1237974, Schema module wants the datetime column to be lower case.
+- Issue #1233084, fix a few places that were wrapping $instance['label'] with t().
+- Issue #1188380 by Xen and jherencia, use #title instead of field['label'] in date display because that has the i18n translation.
+- Issue #1330768 by das-peter, remove whitespace.
 - Tweak date_pager_url to allow a way to create non-absolute urls.
 - Make sure deleted displays won't create errors in Views by returning FALSE in date_forbid() if there is no date argument.
 - Issue #1257830, Beef up the logic when creating the date repeat tabs to work for more kinds of entities.
@@ -114,7 +154,7 @@ Bugfixes
 - Issue #1246416, Test whether libraries_get_path() returns a valid path before using it.
 - Issue #1235994, Don't display 'All Day' when using a format that has no time.
 - Issue #1245690 by mikeryan, Migration plugin missing seconds from date formats
-- Issue #1229406 by David Rothstein, G‡bor Hojtsy, and tim.plunkett Fix broken timepicker in Chrome and Safari.
+- Issue #1229406 by David Rothstein, Gábor Hojtsy, and tim.plunkett Fix broken timepicker in Chrome and Safari.
 - Issue #1239412 by keithm, Fix validation error when #access is false.
 - Issue #1232522, Don't alter field_ui_field_edit form except on date fields.
 - Issue #1243842, Make sure the All Day and Show End Date flags work correctly in unlimited value fields that use ajax.
@@ -272,21 +312,21 @@ Abandoned the 7.x-1.x branch.
 
 Start a new 7.x-2.x branch that will contain a complete re-work of the Views handling.
 
-The 7.x-2.x branch will totally re-work and simplify the Views filters. These changes may/will 
-break some views and will require that you check views that use the date filter or 
+The 7.x-2.x branch will totally re-work and simplify the Views filters. These changes may/will
+break some views and will require that you check views that use the date filter or
 argument to be sure they are still configured correctly.
 
-There is a new date_filter_handler_simple for an individual date field that simplifies 
-the Views handling by using most of the core Views field handling but adds in the 
-possibility to set a default date using options like 'now', along with a choice of a 
+There is a new date_filter_handler_simple for an individual date field that simplifies
+the Views handling by using most of the core Views field handling but adds in the
+possibility to set a default date using options like 'now', along with a choice of a
 month/day/year drop-down selector or popup calendar selector.
 
-The date_filter_handler is an extension of the simple handler that allows you to combine 
-multiple dates into a single filter so that you can control all of them with the same 
+The date_filter_handler is an extension of the simple handler that allows you to combine
+multiple dates into a single filter so that you can control all of them with the same
 filter widget, allowing you to either 'OR' or 'AND' them together.
 
-The arguments will be rewritten in the same way, with a simple argument handler for 
-individual dates and another handler that extends that to control multiple dates with 
+The arguments will be rewritten in the same way, with a simple argument handler for
+individual dates and another handler that extends that to control multiple dates with
 a single argument.
 
 - Add some error trapping in case the parent dateObject is unable to make a date out of a string to avoid showing the user errors.
@@ -299,7 +339,7 @@ a single argument.
 Version 7.x-1.0-alpha2
 ======================
 
-- Views made lots of changes to field handling just before the new release, which broke lots of things here. 
+- Views made lots of changes to field handling just before the new release, which broke lots of things here.
 - Adding some work-arounds to get things working again and waiting until the dust settles on how the new core fields will be handled in Views before doing much more with the Views integration. These changes should get things working with latest Views release.
 
 ======================
@@ -307,6 +347,5 @@ Version 7.x-1.0-alpha1
 ======================
 
 - Initial release, probably still buggy.
-- Remove Date PHP4, no longer needed because PHP4 is not supported any more. 
+- Remove Date PHP4, no longer needed because PHP4 is not supported any more.
 - Remove Date Timezone, now handled by core.
-

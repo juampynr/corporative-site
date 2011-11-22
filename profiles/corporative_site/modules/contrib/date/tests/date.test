@@ -140,5 +140,5 @@ class DateUITestCase extends DrupalWebTestCase {
     $this->clickLink('delete');
     $this->drupalPost(NULL, NULL, t('Delete'));
     $this->assertText('The field Test has been deleted from the Story content type.', 'Removed date field.');
-  }  
+  }
 }

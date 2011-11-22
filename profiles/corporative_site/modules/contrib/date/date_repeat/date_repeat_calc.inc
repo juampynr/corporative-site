@@ -239,7 +239,7 @@ function _date_repeat_calc($rrule, $start, $end, $exceptions, $timezone, $additi
           }
           date_repeat_add_dates($days, $current_day, $start_date, $end_date, $exceptions, $rrule);
         }
-        $finished = date_repeat_is_finished($current_day, $days, $count, $end_date);     
+        $finished = date_repeat_is_finished($current_day, $days, $count, $end_date);
         // Reset to beginning of period before jumping to next period.
         // Needed especially when working with values like 'last Saturday'
         // to be sure we don't skip months like February.
@@ -273,7 +273,7 @@ function _date_repeat_calc($rrule, $start, $end, $exceptions, $timezone, $additi
       // middle of the possible week days, needed so we don't prematurely
       // jump to the next week. The date_repeat_add_dates() function will
       // keep dates outside the range from getting added.
-      if (date_format($current_day, 'l') != $day_names[$day]) {  
+      if (date_format($current_day, 'l') != $day_names[$day]) {
         date_modify($current_day, '-1 ' . $week_start_day . $modify_time);
       }
       while (!$finished) {
@@ -320,7 +320,7 @@ function _date_repeat_calc($rrule, $start, $end, $exceptions, $timezone, $additi
           continue;
         }
 
-        // We'll be at the end of a week, month, or year when 
+        // We'll be at the end of a week, month, or year when
         // we get to this point in the code.
 
         // Go back to the beginning of this period before we jump, to

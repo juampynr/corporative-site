@@ -58,7 +58,20 @@ function twitter_views_default_views() {
       'title' => '%1\'s tweets',
       'default_argument_type' => 'user',
       'default_argument' => '',
-      'validate_type' => 'none',
+      'validate_type' => 'php',
+      'validate_options' => array(
+        'code' => '$uid = arg(1);
+                   if (!empty($uid)) {
+                     $account = user_load($uid);
+                     $twitter_accounts = twitter_twitter_accounts($account);
+                     if(count($twitter_accounts)) {
+                       return TRUE;
+                     }
+                     else {
+                       return FALSE;
+                     }
+                   }',
+      ),
       'validate_fail' => 'not found',
       'break_phrase' => 0,
       'not' => 0,

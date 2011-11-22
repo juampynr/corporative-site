@@ -70,20 +70,20 @@ function template_preprocess_date_navigation(&$vars) {
     $vars['next_options'] = $vars['prev_options'] = array();
   }
 
-  // Check whether navigation links would point to 
+  // Check whether navigation links would point to
   // a date outside the allowed range.
   if (!empty($next_date) && !empty($vars['next_url']) && date_format($next_date, 'Y') > $view->date_info->limit[1]) {
-    $vars['next_url'] = '';    
+    $vars['next_url'] = '';
   }
   if (!empty($prev_date) && !empty($vars['prev_url']) && date_format($prev_date, 'Y') < $view->date_info->limit[0]) {
-    $vars['prev_url'] = '';    
+    $vars['prev_url'] = '';
   }
 
   $vars['prev_options'] += array('attributes' => array());
   $vars['next_options'] += array('attributes' => array());
   $prev_title = '';
   $next_title = '';
-  
+
   // Build next/prev link titles.
   switch ($view->date_info->granularity) {
     case 'year':
@@ -97,7 +97,7 @@ function template_preprocess_date_navigation(&$vars) {
     case 'week':
       $prev_title = t('Navigate to previous week');
       $next_title = t('Navigate to next week');
-      break;      
+      break;
     case 'day':
       $prev_title = t('Navigate to previous day');
       $next_title = t('Navigate to next day');
@@ -116,8 +116,8 @@ function template_preprocess_date_navigation(&$vars) {
     $link = TRUE;
   }
   $params = array(
-    'granularity' => $view->date_info->granularity, 
-    'view' => $view, 
+    'granularity' => $view->date_info->granularity,
+    'view' => $view,
     'link' => $link,
   );
   $nav_title = theme('date_nav_title', $params);
@@ -134,7 +134,7 @@ function template_preprocess_date_views_pager(&$vars) {
   $plugin = $vars['plugin'];
   $input = $vars['input'];
   $view = $plugin->view;
-  
+
   $vars['nav_title'] = '';
   $vars['next_url'] = '';
   $vars['prev_url'] = '';
@@ -199,13 +199,13 @@ function template_preprocess_date_views_pager(&$vars) {
     $vars['next_options'] = $vars['prev_options'] = array();
   }
 
-  // Check whether navigation links would point to 
+  // Check whether navigation links would point to
   // a date outside the allowed range.
   if (!empty($next_date) && !empty($vars['next_url']) && date_format($next_date, 'Y') > $date_info->limit[1]) {
-    $vars['next_url'] = '';    
+    $vars['next_url'] = '';
   }
   if (!empty($prev_date) && !empty($vars['prev_url']) && date_format($prev_date, 'Y') < $date_info->limit[0]) {
-    $vars['prev_url'] = '';    
+    $vars['prev_url'] = '';
   }
   $vars['prev_options'] += array('attributes' => array());
   $vars['next_options'] += array('attributes' => array());
@@ -225,7 +225,7 @@ function template_preprocess_date_views_pager(&$vars) {
     case 'week':
       $prev_title = t('Navigate to previous week');
       $next_title = t('Navigate to next week');
-      break;      
+      break;
     case 'day':
       $prev_title = t('Navigate to previous day');
       $next_title = t('Navigate to next day');
@@ -248,8 +248,8 @@ function template_preprocess_date_views_pager(&$vars) {
     $link = TRUE;
   }
   $params = array(
-    'granularity' => $granularity, 
-    'view' => $view, 
+    'granularity' => $granularity,
+    'view' => $view,
     'link' => $link,
   );
   $nav_title = theme('date_nav_title', $params);
@@ -282,20 +282,20 @@ function theme_date_nav_title($params) {
       $date_arg = $date_info->year .'-'. date_pad($date_info->month) .'-'. date_pad($date_info->day);
       break;
     case 'week':
-    	$format = !empty($format) ? $format : (empty($date_info->mini) ? 'F j Y' : 'F j');
+      $format = !empty($format) ? $format : (empty($date_info->mini) ? 'F j Y' : 'F j');
       $title = t('Week of @date', array('@date' => date_format_date($date_info->min_date, 'custom', $format)));
-    	$date_arg = $date_info->year .'-W'. date_pad($date_info->week);
-    	break;
+      $date_arg = $date_info->year .'-W'. date_pad($date_info->week);
+      break;
   }
   if (!empty($date_info->mini) || $link) {
-  	// Month navigation titles are used as links in the mini view.
+    // Month navigation titles are used as links in the mini view.
     $attributes = array('title' => t('View full page month'));
-  	$url = date_pager_url($view, $granularity, $date_arg, TRUE);
+    $url = date_pager_url($view, $granularity, $date_arg, TRUE);
     return l($title, $url, array('attributes' => $attributes));
   }
   else {
     return $title;
-  }  
+  }
 }
 
 /**

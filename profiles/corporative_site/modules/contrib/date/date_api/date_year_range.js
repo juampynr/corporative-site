@@ -143,7 +143,7 @@ Drupal.dateYearRange.SelectListWithCustomOption.prototype.createDropdown = funct
 Drupal.dateYearRange.SelectListWithCustomOption.prototype._setInitialDropdownValue = function ($dropdown) {
   var textfieldValue = this.getOriginal();
   // Determine whether the original textfield value exists in the dropdown.
-  var possible = $dropdown.find('option[value=' + textfieldValue + ']');
+  var possible = $dropdown.find('option[value="' + textfieldValue + '"]');
   // If the original textfield value is one of the dropdown options, preselect
   // it and hide the 'other' textfield.
   if (possible.length) {

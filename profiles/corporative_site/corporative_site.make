@@ -112,6 +112,9 @@ projects[twitter][download][type] = "git"
 projects[twitter][download][url] = "http://git.drupal.org/project/twitter.git"
 projects[twitter][download][branch] = "7.x-3.x"
 
+projects[workbench][subdir] = "contrib"
+projects[workbench][version] = "1.1"
+
 ; Libraries
 libraries[jquery.cycle][download][type] = "get"
 libraries[jquery.cycle][download][url] = "https://raw.github.com/malsup/cycle/master/jquery.cycle.all.js"

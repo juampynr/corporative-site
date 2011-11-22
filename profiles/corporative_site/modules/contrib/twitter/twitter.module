@@ -1,4 +1,11 @@
 <?php
+/**
+ * @file
+ * Provides API integration with the Twitter microblogging service.
+ */
+
+define('TWITTER_HOMEPAGE', 'http://twitter.com');
+define('TWITTER_SEARCH', 'http://twitter.com/search');
 
 /**
  * Implements hook_menu().
@@ -21,21 +28,24 @@ function twitter_menu() {
     'access arguments' => array('administer site configuration'),
     'file' => 'twitter.pages.inc',
   );
+
   $items['admin/config/services/twitter/default'] = array(
     'title' => 'Twitter',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $items['user/%user/edit/twitter'] = array(
+  $items['user/%user_category/edit/twitter'] = array(
     'title' => 'Twitter accounts',
     'page callback' => 'twitter_user_settings',
     'page arguments' => array(1),
     'access callback' => 'twitter_edit_access',
     'access arguments' => array(1),
+    'load arguments' => array('%map', '%index'),
     'weight' => 10,
     'file' => 'twitter.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
+
   $items['user/%user/edit/twitter/global/%'] = array(
     'title' => 'Twitter accounts',
     'page callback' => 'drupal_get_form',
@@ -70,6 +80,19 @@ function twitter_permission() {
     ),
     'import own tweets' => array(
       'title' => t('Import own tweets to the site.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_user_categories().
+ */
+function twitter_user_categories() {
+  return array(
+    array(
+      'name' => 'twitter',
+      'title' => t('Twitter accounts'),
+      'weight' => 3,
     ),
   );
 }
@@ -138,14 +161,14 @@ function twitter_filter_info() {
   $filters['twitter_username'] = array(
     'title' => t('Twitter @username converter'),
     'description' => t('Converts Twitter-style @usernames into links to Twitter account pages.'),
-    'process callback' => 'twitter_filter_link',
-    'tips callback' => 'twitter_filter_tip_username',
+    'process callback' => '_twitter_filter_username',
+    'tips callback' => '_twitter_filter_tip_username',
   );
   $filters['twitter_hashtag'] = array(
     'title' => t('Twitter #hashtag converter'),
     'description' => t('Converts Twitter-style #hashtags into links to hashtags.org.'),
-    'process callback' => 'twitter_filter_link',
-    'tips callback' => 'twitter_filter_tip_hashtag',
+    'process callback' => '_twitter_filter_hashtag',
+    'tips callback' => '_twitter_filter_tip_hashtag',
   );
   return $filters;
 }
@@ -153,34 +176,54 @@ function twitter_filter_info() {
 /**
  * Filter tips callback function for $filters[0] in hook_filter_info().
  */
-function twitter_filter_tip_username($format, $long = FALSE) {
+function _twitter_filter_tip_username($filter, $format, $long = FALSE) {
   return t('Twitter-style @usernames are linked to their Twitter account pages.');
 }
 
 /**
  * Filter tips callback function for $filters[1] in hook_filter_info().
  */
-function twitter_filter_tip_hashtag($format, $long = FALSE) {
+function _twitter_filter_tip_hashtag($format, $long = FALSE) {
   return t('Twitter-style #hashtags are linked to !url.', array('!url' => '<a href="http://search.twitter.com/">search.twitter.com</a>'));
+}
+
+/**
+ * Callback for twitter @username converter
+ */
+function _twitter_filter_username($text, $filter) {
+  $prefix = '@';
+  $destination = TWITTER_HOMEPAGE;
+  return _twitter_filter_text($text, $prefix, $destination);
+}
+
+/**
+ * Callback for twitter #hashtag converter
+ */
+function _twitter_filter_hashtag($text, $filter) {
+  $prefix = '#';
+  $destination = TWITTER_SEARCH;
+  return _twitter_filter_text($text, $prefix, $destination);
 }
 
 /**
  * This helper function converts Twitter-style @usernames and #hashtags into
  * actual links.
  */
-function twitter_filter_link($text, $prefix = '@', $destination = 'http://twitter.com/') {
+function _twitter_filter_text($text, $prefix, $destination) {
   $matches = array(
     '/\>' . $prefix . '([a-z0-9_]+)/i',
     '/^' . $prefix . '([a-z0-9_]+)/i',
     '/(\s+)' . $prefix . '([a-z0-9_]+)/i',
   );
   $replacements = array(
-    '><a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
-    '<a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
-    '${1}<a href="' . $destination . '${2}">' . $prefix . '${2}</a>',
+    '><a href="' . $destination . '/${1}">' . $prefix . '${1}</a>',
+    '<a href="' . $destination . '/${1}">' . $prefix . '${1}</a>',
+    '${1}<a href="' . $destination . '/${2}">' . $prefix . '${2}</a>',
   );
   return preg_replace($matches, $replacements, $text);
 }
+
+/**
 
 /**
  * Implements hook_user_load().
@@ -196,13 +239,16 @@ function twitter_user_load($accounts) {
  * separate module eventually, but sticking the code here and using a hook
  * lets other modules solve the 'what accounts can a user post with' problem
  * in cleaner ways.
+ *
+ * @return
+ *   array with Twitter accounts
  */
 function twitter_twitter_accounts($account) {
   module_load_include('inc', 'twitter');
 
   $query = db_select('twitter_account', 'ta')
     ->fields('ta', array('twitter_uid'));
-  if (user_access('use global twitter account')) {
+  if (user_access('use global twitter account', $account)) {
     $or = db_or();
     $or->condition('ta.uid', $account->uid);
     $or->condition('ta.is_global', 1);

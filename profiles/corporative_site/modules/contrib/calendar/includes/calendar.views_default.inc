@@ -256,20 +256,6 @@ $handler->display->display_options['filters']['status']['field'] = 'status';
 $handler->display->display_options['filters']['status']['value'] = 1;
 $handler->display->display_options['filters']['status']['group'] = 0;
 $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-$handler->display->display_options['arguments']['date_argument']['id'] = 'date_argument';
-$handler->display->display_options['arguments']['date_argument']['table'] = 'node';
-$handler->display->display_options['arguments']['date_argument']['field'] = 'date_argument';
-$handler->display->display_options['arguments']['date_argument']['default_action'] = 'default';
-$handler->display->display_options['arguments']['date_argument']['default_argument_type'] = 'date';
-$handler->display->display_options['arguments']['date_argument']['default_argument_skip_url'] = 0;
-$handler->display->display_options['arguments']['date_argument']['summary']['format'] = 'default_summary';
-$handler->display->display_options['arguments']['date_argument']['year_range'] = '-3:+3';
-$handler->display->display_options['arguments']['date_argument']['granularity'] = 'month';
-$handler->display->display_options['arguments']['date_argument']['add_delta'] = 'yes';
-$handler->display->display_options['arguments']['date_argument']['date_fields'] = drupal_map_assoc($aliases);
-$handler->display->display_options['arguments']['date_argument']['date_method'] = 'OR';
-$handler->display->display_options['arguments']['date_argument']['date_group'] = 'date';
-
 
 /* Display: Month */
 $handler = $view->new_display('page', 'Month', 'page_1');

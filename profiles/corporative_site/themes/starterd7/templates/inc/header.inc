@@ -49,7 +49,7 @@
 	      </div> <!-- //#breadcrumb -->
 	    <?php endif; ?>
 	    
-	    <?php if ($tabs): ?>
+	    <?php if (is_array($tabs['#primary'])): ?>
         <div id="tabs">
           <?php print render($tabs); ?>
         </div>

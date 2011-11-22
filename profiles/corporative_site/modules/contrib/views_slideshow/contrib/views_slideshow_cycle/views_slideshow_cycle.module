@@ -6,32 +6,6 @@
  */
 
 /**
- * Implements hook_init().
- */
-function views_slideshow_cycle_init() {
-  // Don't load javascript unless libraries module is present.
-  if (module_exists('libraries')) {
-    // Load jQuery Cycle
-    if ($cycle_path = _views_slideshow_cycle_library_path()) {
-      drupal_add_js($cycle_path);
-    }
-
-    // Load Json2
-    $json_path = libraries_get_path('json2');
-    if (!empty($json_path) && file_exists($json_path . '/json2.js')) {
-      drupal_add_js($json_path . '/json2.js');
-    }
-
-    // Load our cycle js
-    $module_path = drupal_get_path('module', 'views_slideshow_cycle');
-    drupal_add_js($module_path . '/js/views_slideshow_cycle.js');
-  }
-
-  // Load our cycle css
-  drupal_add_css($module_path . '/views_slideshow_cycle.css', 'file');
-}
-
-/**
  * Implements hook_theme().
  */
 function views_slideshow_cycle_theme($existing, $type, $theme, $path) {
@@ -46,11 +20,11 @@ function views_slideshow_cycle_theme($existing, $type, $theme, $path) {
       'template' => 'theme/views-slideshow-cycle-main-frame',
     ),
     'views_slideshow_cycle_main_frame_row' => array(
-      'variables' => array('vss_id' => NULL, 'items' => NULL, 'count' => NULL),
+      'variables' => array('vss_id' => NULL, 'items' => NULL, 'count' => NULL, 'view' => NULL),
       'template' => 'theme/views-slideshow-cycle-main-frame-row',
     ),
     'views_slideshow_cycle_main_frame_row_item' => array(
-      'variables' => array('item' => NULL, 'item_count' => NULL),
+      'variables' => array('item' => NULL, 'item_count' => NULL, 'view' => NULL),
       'template' => 'theme/views-slideshow-cycle-main-frame-row-item',
     ),
   );

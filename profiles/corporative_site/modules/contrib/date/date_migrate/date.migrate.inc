@@ -77,7 +77,7 @@ class DateMigrateFieldHandler extends MigrateFieldHandler {
       $rrule = $default_rrule;
 
       // Is the value a straight datetime value, or JSON containing a set of properties?
-      if ($from{0} == '{') {
+      if (!empty($from) && $from{0} == '{') {
         $properties = drupal_json_decode($from);
         $from = $properties['from'];
         // Properties passed in with the date override any set via arguments

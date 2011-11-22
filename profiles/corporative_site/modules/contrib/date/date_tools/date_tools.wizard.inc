@@ -12,19 +12,19 @@ function date_tools_wizard_form() {
     '#default_value' => 'date',
     '#title' => t('Content type name'),
     '#description' => t('Machine-readable name. Allowed values: (a-z, 0-9, _). If this is not an existing content type, the content type will be created.'),
-    ); 
+    );
   $form['type']['name'] = array(
     '#type' => 'textfield',
     '#default_value' => t('Date'),
     '#title' => t('Content type label'),
     '#description' => t('The human-readable name for this content type. Only needed when creating a new content type.'),
-    ); 
+    );
   $form['type']['type_description'] = array(
     '#type' => 'textarea',
     '#default_value' => t('A date content type that is linked to a Views calendar.'),
     '#title' => t('Content type description'),
     '#description' => t('A description for the content type. Only needed when creating a new content type.'),
-    );      
+    );
   $form['field'] = array(
     '#type' => 'fieldset',
     '#title' => t('Date field'),
@@ -55,7 +55,7 @@ function date_tools_wizard_form() {
     '#options' => array(0 => t('No'), 1 => t('Yes')),
     '#title' => t('Show repeating date options'),
     '#access' => module_exists('date_repeat'),
-    );  
+    );
   $form['field']['advanced'] = array(
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
@@ -68,7 +68,7 @@ function date_tools_wizard_form() {
     '#options' => array('' => t('Never'), 'optional' => t('Optional'), 'required' => t('Required')),
     '#title' => t('End Date'),
     '#description' => t("Display a matching second date field as a 'End date'."),
-    );  
+    );
   $form['field']['advanced']['field_type'] = array(
     '#type' => 'select',
     '#options' => date_tools_wizard_field_types(),
@@ -82,7 +82,7 @@ function date_tools_wizard_form() {
     '#default_value' => array('month', 'day', 'year', 'hour', 'minute'),
     '#title' => t('Granularity'),
     '#multiple' => TRUE,
-    );  
+    );
   $form['field']['advanced']['year_range'] = array(
     '#type' => 'textfield',
     '#default_value' => '-1:+1',
@@ -102,7 +102,7 @@ function date_tools_wizard_form() {
     '#options' => array(0 => t('No'), 1 => t('Yes')),
     '#title' => t('Create a calendar for this date field'),
     '#access' => module_exists('calendar'),
-    ); 
+    );
   $current_theme = variable_get('theme_default', 'garland');
   $options = array('' => t('None')) + system_region_list($current_theme);
   $form['blocks'] = array(
@@ -111,12 +111,12 @@ function date_tools_wizard_form() {
     '#default_value' => 0,
     '#title' => t('Add calendar blocks to a region'),
     '#access' => module_exists('calendar'),
-    );  
+    );
 
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
-    );      
+    );
 
   return $form;
 }
@@ -162,7 +162,7 @@ function date_tools_wizard_build($form_values) {
   }
 
   // Create a node type if it doesn't already exist.
-  // This makes it possible to add additional date fields to 
+  // This makes it possible to add additional date fields to
   // an existing type.
   $types = node_type_get_names();
   $type_settings = array();
@@ -213,13 +213,13 @@ function date_tools_wizard_build($form_values) {
         'input_format' => date_default_format($widget_type),
         'text_parts' => array(),
         'label_position' => 'above',
-        'repeat_collapsed' => 0,          
+        'repeat_collapsed' => 0,
       ),
       'weight' => -4,
     ),
     'settings' => array(
-      'default_value' => 'now', 
-      'default_value2' => 'blank', 
+      'default_value' => 'now',
+      'default_value2' => 'blank',
     )
   );
 
@@ -259,13 +259,13 @@ function date_tools_wizard_build($form_values) {
 
   //_field_info_collate_fields(TRUE);
   field_info_cache_clear(TRUE);
-  field_cache_clear(TRUE);  
+  field_cache_clear(TRUE);
 
   $view_name = '';
   if (!empty($calendar) && module_exists('calendar')) {
     $view_name = date_tools_wizard_create_calendar($name, $bundle, $field, $instance);
     if (!empty($blocks)) {
-      date_tools_wizard_create_blocks($bundle, $blocks);  
+      date_tools_wizard_create_blocks($bundle, $blocks);
     }
   }
 
@@ -286,21 +286,21 @@ function date_tools_wizard_include() {
 }
 
 function date_tools_wizard_field_types() {
-  $field_types = array();  
+  $field_types = array();
   foreach (date_field_info() as $name => $info) {
     $field_types[$name] = $info['label']; //. ' - ' . $info['description'];
   }
-  return $field_types;  
+  return $field_types;
 }
 
 function date_tools_wizard_widget_types() {
-  $widget_types = array();  
+  $widget_types = array();
   foreach (date_field_widget_info() as $name => $info) {
     if (!strstr($name, '_repeat')) {
       $widget_types[$name] = $info['label'];
     }
   }
-  return $widget_types;  
+  return $widget_types;
 }
 
 function date_tools_wizard_tz_handling() {
@@ -321,7 +321,7 @@ function date_tools_wizard_create_content_type($name, $bundle, $description, $ty
     'body_label' => 'Body',
     'min_word_count' => '0',
     'help' => '',
-    'node_options' => 
+    'node_options' =>
     array (
       'status' => 1,
       'promote' => 1,
@@ -412,11 +412,11 @@ function date_tools_wizard_create_calendar($name, $bundle, $date_field, $date_in
   cache_clear_all('*', 'cache_views');
 
   // Clear the page cache.
-  cache_clear_all();  
+  cache_clear_all();
 
   // Remove this view from cache so we can edit it properly.
   module_load_include('inc', 'ctools', 'includes/object-cache');
-  ctools_object_cache_clear('view', 'calendar_' . $bundle);  
+  ctools_object_cache_clear('view', 'calendar_' . $bundle);
 
   // Force Views to empty its cache and find the new view.
   views_get_all_views(TRUE);
@@ -441,16 +441,16 @@ function date_tools_wizard_create_blocks($bundle, $region) {
   $block->status = 1;
   date_tools_wizard_add_block($block);
 
-  // Mini calendar block. 
+  // Mini calendar block.
   $block->module = 'views';
   $block->delta = 'cal_' . $bundle . '-calendar_block_1';
-  date_tools_wizard_add_block($block); 
+  date_tools_wizard_add_block($block);
 
   // Upcoming events block.
   $block->module = 'views';
   $block->delta = 'cal_' . $bundle . '-block_1';
   date_tools_wizard_add_block($block);
-  return;      
+  return;
 }
 
 /**

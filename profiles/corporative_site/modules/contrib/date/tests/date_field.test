@@ -88,13 +88,13 @@ abstract class DateFieldBasic extends DrupalWebTestCase {
           'input_format_custom' => $input_format_custom,
           'text_parts' => $text_parts,
           'label_position' => 'above',
-          'repeat_collapsed' => 0,          
+          'repeat_collapsed' => 0,
         ),
         'weight' => -4,
       ),
       'settings' => array(
-        'default_value' => $default_value, 
-        'default_value2' => $default_value2, 
+        'default_value' => $default_value,
+        'default_value2' => $default_value2,
       )
     );
 
@@ -134,7 +134,7 @@ abstract class DateFieldBasic extends DrupalWebTestCase {
 
     //_field_info_collate_fields(TRUE);
     field_info_cache_clear(TRUE);
-    field_cache_clear(TRUE); 
+    field_cache_clear(TRUE);
 
     // Look at how the field got configured.
     $this->drupalGet("admin/structure/types/manage/$bundle/fields/$field_name");
@@ -167,8 +167,8 @@ class DateFieldTestCase extends DateFieldBasic {
         $field_name = "field_test_$widget_type";
         $label = 'Test';
         $options = array(
-          'label' => $label, 
-          'widget_type' => $widget_type, 
+          'label' => $label,
+          'widget_type' => $widget_type,
           'field_name' => $field_name,
           'field_type' => $field_type,
           'input_format' => 'm/d/Y - H:i',

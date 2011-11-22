@@ -37,7 +37,7 @@ function date_sql_coalesce($array) {
     case ('mysqli'):
     case ('pgsql'):
       return "COALESCE(" . implode(',', $array) . ")";
-  }  
+  }
 }
 
 /**
@@ -76,7 +76,7 @@ class date_sql_handler {
     $this->local_timezone = isset($local_timezone) ? $local_timezone : date_default_timezone();
     $this->set_db_timezone($offset);
   }
-  
+
   /**
    * See if the db has timezone name support.
    */
@@ -106,15 +106,15 @@ class date_sql_handler {
 
   /**
    * Set the database timzone offset.
-   * 
-   * Setting the db timezone to UTC is done to ensure consistency in date 
+   *
+   * Setting the db timezone to UTC is done to ensure consistency in date
    * handling whether or not the database can do proper timezone conversion.
-   * 
+   *
    * Views filters that not exposed are cached and won't set the timezone
-   * so views date filters should add 'cacheable' => 'no' to their 
-   * definitions to ensure that the database timezone gets set properly 
+   * so views date filters should add 'cacheable' => 'no' to their
+   * definitions to ensure that the database timezone gets set properly
    * when the query is executed.
-   * 
+   *
    * @param $offset
    *   An offset value to set the database timezone to. This will only
    *   set a fixed offset, not a timezone, so any value other than
@@ -133,7 +133,9 @@ class date_sql_handler {
           db_query("SET TIME ZONE INTERVAL '$offset' HOUR TO MINUTE");
           break;
         case 'sqlsrv':
-          db_query('TimeZone.setDefault(TimeZone.getTimeZone("GMT"))');
+          // Issue #1201342, This is the wrong way to set the timezone, this still needs to be fixed.
+          // In the meantime, commenting this out makes SQLSRV functional.
+          //db_query('TimeZone.setDefault(TimeZone.getTimeZone("GMT"))');
           break;
       }
       $already_set = TRUE;
@@ -212,7 +214,7 @@ class date_sql_handler {
       case 'sqlsrv':
         switch ($this->date_type) {
           case DATE_UNIX:
-            $field = "DATEDIFF(s, '19700101 00:00:00:000', $field)";
+            $field = "DATEADD(s, $field, '19700101 00:00:00:000')";
             break;
           case DATE_ISO:
           case DATE_DATETIME:
@@ -248,7 +250,7 @@ class date_sql_handler {
 
   /**
    * Adjust a field value by time interval.
-   * 
+   *
    * @param $field
    *   The field to be adjusted.
    * @param $direction
@@ -289,26 +291,26 @@ class date_sql_handler {
         }
      }
      return $field;
-  }  
+  }
 
   /**
    * Select a date value from the database, adjusting the value
    * for the timezone.
-   * 
+   *
    * Check whether database timezone conversion is supported in
    * this system and use it if possible, otherwise use an
    * offset.
-   * 
+   *
    * @param $offset
-   *   Set a fixed offset or offset field to use for the date. 
-   *   If set, no timezone conversion will be done and the 
+   *   Set a fixed offset or offset field to use for the date.
+   *   If set, no timezone conversion will be done and the
    *   offset will be used.
    */
   function sql_tz($field, $offset = NULL) {
     // If the timezones are values they need to be quoted, but
     // if they are field names they do not.
     $db_zone   = !empty($this->db_timezone_field) ? $this->db_timezone_field : "'{$this->db_timezone}'";
-    $localzone = !empty($this->local_timezone_field) ? $this->local_timezone_field : "'{$this->local_timezone}'"; 
+    $localzone = !empty($this->local_timezone_field) ? $this->local_timezone_field : "'{$this->local_timezone}'";
     // If a fixed offset is required, use it.
     if ($offset !== NULL) {
       return $this->sql_offset($field, $offset);
@@ -442,7 +444,26 @@ class date_sql_handler {
           '\WW' => '', // Week number
           );
         $format = strtr($format, $replace);
-        return "DATEPART($format, $field)";
+        $formatters = explode(' ', $format);
+        $month_formatters = explode('-', $formatters[0]);
+        $output = '';
+        foreach($month_formatters as $formatter) {
+          $output .= "CAST(DATEPART($formatter, $field) as varchar)+";
+        }
+
+        if (isset($formatters[1])) {
+          $time_formatters = explode(':', $formatters[1]);
+          $output .= ' ';
+          foreach($time_formatters as $formatter) {
+            $output .= "CAST(DATEPART($formatter, $field) as varchar)+':'+";
+          }
+          $output = substr($output, 0, strlen($output)-5);
+        }
+        else {
+          $output = substr($output, 0, strlen($output)-1);
+        }
+
+        return $output;
     }
   }
 
@@ -517,7 +538,7 @@ class date_sql_handler {
    * @param int $value
    *   The value to compare the extracted date part to, could be a
    *   field name or a date string or NOW().
-   * @return 
+   * @return
    *   SQL for the where clause for this operation.
    */
   function sql_where_date($type, $field, $operator, $value, $adjustment = 0) {
@@ -527,13 +548,13 @@ class date_sql_handler {
     }
     elseif ($type == 'FIELD') {
       $value = $this->sql_field($value, $adjustment);
-    }    
+    }
     elseif ($type == 'DATE') {
       $date = new DateObject($value, date_default_timezone(), DATE_FORMAT_DATETIME);
       if (!empty($adjustment)) {
         date_modify($date, $adjustment . ' seconds');
       }
-      // When comparing a field to a date we can avoid doing timezone 
+      // When comparing a field to a date we can avoid doing timezone
       // conversion by altering the comparison date to the db timezone.
       // This won't work if the timezone is a field instead of a value.
       if (empty($this->db_timezone_field) && empty($this->local_timezone_field) && $this->db_timezone_field != $this->local_timezone_field) {
@@ -541,7 +562,7 @@ class date_sql_handler {
         $this->local_timezone = $this->db_timezone;
       }
       $value = "'" . $date->format(DATE_FORMAT_DATETIME, true) . "'";
-    }    
+    }
     if ($this->local_timezone != $this->db_timezone) {
       $field = $this->sql_field($field);
     }
@@ -562,7 +583,7 @@ class date_sql_handler {
    *   The db comparison operator to use, like '=' .
    * @param int $value
    *   The integer value to compare the extracted date part to.
-   * @return 
+   * @return
    *   SQL for the where clause for this operation.
    */
   function sql_where_extract($part, $field, $operator, $value) {
@@ -587,7 +608,7 @@ class date_sql_handler {
    * @param string $value
    *   The value to compare the extracted date part to, could be a
    *   field name or a date string or NOW().
-   * @return 
+   * @return
    *   SQL for the where clause for this operation.
    */
   function sql_where_format($format, $field, $operator, $value) {
@@ -606,11 +627,11 @@ class date_sql_handler {
    */
   function date_parts($limit = NULL) {
     $parts =  array(
-      'year' => t('Year', array(), array('context' => 'datetime')), 
-      'month' => t('Month', array(), array('context' => 'datetime')), 
+      'year' => t('Year', array(), array('context' => 'datetime')),
+      'month' => t('Month', array(), array('context' => 'datetime')),
       'day' => t('Day', array(), array('context' => 'datetime')),
-      'hour' => t('Hour', array(), array('context' => 'datetime')), 
-      'minute' => t('Minute', array(), array('context' => 'datetime')), 
+      'hour' => t('Hour', array(), array('context' => 'datetime')),
+      'minute' => t('Minute', array(), array('context' => 'datetime')),
       'second' => t('Second', array(), array('context' => 'datetime')),
       );
     if (!empty($limit)) {
@@ -631,7 +652,7 @@ class date_sql_handler {
    * Part information.
    *
    * @param $op
-   *   'min', 'max', 'format', 'sep', 'empty_now', 'empty_min', 'empty_max' . 
+   *   'min', 'max', 'format', 'sep', 'empty_now', 'empty_min', 'empty_max' .
    *   Returns all info if empty.
    * @param $part
    *   'year', 'month', 'day', 'hour', 'minute', or 'second.
@@ -653,13 +674,13 @@ class date_sql_handler {
       'hour' => ' ', 'minute' => ':', 'second' => ':');
     $info['empty_now'] = array(
       'year' => date('Y'), 'month' => date('m'), 'day' => min('28', date('d')),
-      'hour' => date('H'), 'minute' => date('i'), 'second' => date('s'));  
+      'hour' => date('H'), 'minute' => date('i'), 'second' => date('s'));
     $info['empty_min'] = array(
       'year' => '1000', 'month' => '01', 'day' => '01',
-      'hour' => '00', 'minute' => '00', 'second' => '00');  
+      'hour' => '00', 'minute' => '00', 'second' => '00');
     $info['empty_max'] = array(
       'year' => '9999', 'month' => '12', 'day' => '31',
-      'hour' => '23', 'minute' => '59', 'second' => '59');  
+      'hour' => '23', 'minute' => '59', 'second' => '59');
     if (!empty($op)) {
       if (!empty($part)) {
         return $info[$op][$part];
@@ -672,9 +693,9 @@ class date_sql_handler {
   }
 
   /**
-   * Create a complete datetime value out of an 
+   * Create a complete datetime value out of an
    * incomplete array of selected values.
-   * 
+   *
    * For example, array('year' => 2008, 'month' => 05) will fill
    * in the day, hour, minute and second with the earliest possible
    * values if type = 'min', the latest possible values if type = 'max',
@@ -701,7 +722,7 @@ class date_sql_handler {
     }
 
     $compare = array_merge($this->part_info('empty_' . $type), $selected);
-    // If this is a max date, make sure the last day of 
+    // If this is a max date, make sure the last day of
     // the month is the right one for this date.
     if ($type == 'max') {
       $compare['day'] = date_days_in_month($compare['year'], $compare['month']);
@@ -804,7 +825,7 @@ class date_sql_handler {
 
   /**
    * Parse date parts from an ISO date argument.
-   * 
+   *
    * Based on ISO 8601 date duration and time interval standards.
    *
    * See http://en.wikipedia.org/wiki/ISO_8601#Week_dates for definitions of ISO weeks.
@@ -843,7 +864,7 @@ class date_sql_handler {
           }
           else {
             $date['week'] = $matches[3];
-          }    
+          }
         }
         if (!empty($matches[4])) $date['day'] = $matches[4];
         if (!empty($matches[5])) $date['hour'] = $matches[5];
@@ -899,8 +920,8 @@ class date_sql_handler {
       '  ' => '',
       ' ' => '',
       );
-    $prefix = in_array($item, array('hours', 'hour', 'minutes', 'minute', 'seconds', 'second')) ? 'T' : '';  
-    return $prefix . strtr($direction, $replace) . $count . strtr($item, $replace);  
+    $prefix = in_array($item, array('hours', 'hour', 'minutes', 'minute', 'seconds', 'second')) ? 'T' : '';
+    return $prefix . strtr($direction, $replace) . $count . strtr($item, $replace);
   }
 
   /**
@@ -912,7 +933,7 @@ class date_sql_handler {
     $parts = $this->arg_parts($arg);
     $date = !empty($parts[0]['date']) ? $parts[0]['date'] : (!empty($parts[1]['date']) ? $parts[1]['date'] : array());
     foreach ($date as $key => $part) {
-      $granularity = $key;    
+      $granularity = $key;
     }
     return $granularity;
   }

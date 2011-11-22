@@ -16,7 +16,7 @@ function date_views_theme() {
     'date_vevent' => $base + array('variables' => array('event' => NULL)),
     'date_valarm' => $base + array('variables' => array('alarm' => NULL)),
     'date_views_filter_form' => $base + array('template' => 'date-views-filter-form', 'render element' => 'form'),
-    'date_calendar_day' => $base + array('variables' => array('date' => NULL)),  
+    'date_calendar_day' => $base + array('variables' => array('date' => NULL)),
 
     'date_views_pager' => $base + array(
       'variables' => array('plugin' => NULL, 'input' => NULL),
@@ -55,8 +55,8 @@ function date_views_date_views_tables() {
 /**
  * Implement hook_date_views_fields().
  * on behalf of core fields.
- * 
- * All modules that create custom fields that use the 
+ *
+ * All modules that create custom fields that use the
  * 'views_handler_field_date' handler can provide
  * additional information here about the type of
  * date they create so the date can be used by
@@ -65,17 +65,17 @@ function date_views_date_views_tables() {
 function date_views_date_views_fields($field) {
   $values = array(
     // The type of date: DATE_UNIX, DATE_ISO, DATE_DATETIME.
-    'sql_type' => DATE_UNIX, 
+    'sql_type' => DATE_UNIX,
     // Timezone handling options: 'none', 'site', 'date', 'utc' .
     'tz_handling' => 'site',
     // Needed only for dates that use 'date' tz_handling.
-    'timezone_field' => '', 
+    'timezone_field' => '',
     // Needed only for dates that use 'date' tz_handling.
-    'offset_field' => '', 
-    // Array of "table.field" values for related fields that should be 
+    'offset_field' => '',
+    // Array of "table.field" values for related fields that should be
     // loaded automatically in the Views SQL.
     'related_fields' => array(),
-    // Granularity of this date field's db data. 
+    // Granularity of this date field's db data.
     'granularity' => array('year', 'month', 'day', 'hour', 'minute', 'second'),
   );
 
@@ -90,7 +90,7 @@ function date_views_date_views_fields($field) {
     case 'node_counter.timestamp':
     case 'accesslog.timestamp':
     case 'comments.timestamp':
-    case 'node_comment_statistics.last_comment_timestamp':  
+    case 'node_comment_statistics.last_comment_timestamp':
       return $values;
   }
 }
@@ -98,14 +98,14 @@ function date_views_date_views_fields($field) {
 /**
  * Figure out the URL of the date view we're currently looking at,
  * adapted to various date types or specific date arguments.
- * 
+ *
  * @param $date_type
  *  - if not empty, return the url of a specific date type.
  * @param $date_arg
  *  - if not empty, return the url for a view with a specific date argument.
  * @param $force_view_url
  *  - always use the view url, even if embedded.
- * @return 
+ * @return
  *   return the requested view url.
  */
 function date_real_url($view, $date_type = NULL, $date_arg = NULL, $force_view_url = FALSE) {
@@ -116,8 +116,8 @@ function date_real_url($view, $date_type = NULL, $date_arg = NULL, $force_view_u
   // in numerical order. Sort the arguments to ensure the correct order.
   ksort($args);
 
-  // If there are empty arguments before the date argument, 
-  // pad them with the wildcard so the date argument will be in 
+  // If there are empty arguments before the date argument,
+  // pad them with the wildcard so the date argument will be in
   // the right position.
   if (count($args) < $pos) {
     foreach ($view->argument as $name => $argument) {
@@ -152,22 +152,22 @@ function date_real_url($view, $date_type = NULL, $date_arg = NULL, $force_view_u
   }
   // Is this an embedded or a block view?
   // Return the pager query value.
-  if (!$force_view_url && 
+  if (!$force_view_url &&
   (!empty($view->preview) || !empty($view->date_info->block_identifier))) {
 
     $url = $view->get_url($args);
     $key = date_block_identifier($view);
     if (!empty($key)) {
       return url($_GET['q'], array(
-        'query' => date_views_querystring($view, array($key => $url)), 
+        'query' => date_views_querystring($view, array($key => $url)),
         'absolute' => TRUE));
     }
-  }  
-  
+  }
+
   // Normal views may need querystrings appended to them
   // if they use exposed filters.
   return url($view->get_url($args), array(
-    'query' => date_views_querystring($view), 
+    'query' => date_views_querystring($view),
     'absolute' => TRUE));
 }
 
@@ -182,8 +182,8 @@ function date_pager_url($view, $date_type = NULL, $date_arg = NULL, $force_view_
   // in numerical order. Sort the arguments to ensure the correct order.
   ksort($args);
 
-  // If there are empty arguments before the date argument, 
-  // pad them with the wildcard so the date argument will be in 
+  // If there are empty arguments before the date argument,
+  // pad them with the wildcard so the date argument will be in
   // the right position.
   if (count($args) < $pos) {
     foreach ($view->argument as $name => $argument) {
@@ -218,22 +218,22 @@ function date_pager_url($view, $date_type = NULL, $date_arg = NULL, $force_view_
   }
   // Is this an embedded or a block view?
   // Return the pager query value.
-  if (!$force_view_url && 
+  if (!$force_view_url &&
   (!empty($view->preview) || !empty($view->date_info->block_identifier))) {
 
     $url = $args[$pos];
     $key = date_block_identifier($view);
     if (!empty($key)) {
       return url($_GET['q'], array(
-        'query' => date_views_querystring($view, array($key => $url)), 
+        'query' => date_views_querystring($view, array($key => $url)),
         'absolute' => $absolute));
     }
-  }  
-  
+  }
+
   // Normal views may need querystrings appended to them
   // if they use exposed filters.
   return url($view->get_url($args), array(
-    'query' => date_views_querystring($view), 
+    'query' => date_views_querystring($view),
     'absolute' => $absolute));
 }
 
@@ -265,7 +265,7 @@ function date_views_field_views_data_alter(&$result, $field, $module) {
       $additional = array();
       $field_name = $field['field_name'];
       foreach ($data as $column => $value) {
-    
+
         // The old 'entity_id' and 'revision_id' values got rewritten in Views.
         // The old values are still there with a 'moved to' key, so ignore them.
         if (array_key_exists('field', $value) && !array_key_exists('moved to', $value['field'])) {
@@ -274,9 +274,9 @@ function date_views_field_views_data_alter(&$result, $field, $module) {
           // Might still need it to handle grouping of multiple value dates.
           //$result[$table][$column]['field']['handler'] = 'date_handler_field_date';
           //$result[$table][$column]['field']['add fields to query'] = TRUE;
-        } 
-        
-        // For filters, arguments, and sorts, determine if this column is for 
+        }
+
+        // For filters, arguments, and sorts, determine if this column is for
         // the start date ('value') or the end date ('value2').
         $this_column = NULL;
         foreach (array_keys($field['columns']) as $candidate_column) {
@@ -306,7 +306,7 @@ function date_views_field_views_data_alter(&$result, $field, $module) {
           $result[$table][$column]['filter']['empty field name'] = t('Undated');
           $result[$table][$column]['filter']['is date'] = TRUE;
           $replace_label = $has_end_date;
-        } 
+        }
         if (array_key_exists('sort', $value)) {
           $result[$table][$column]['sort']['is date'] = TRUE;
           $replace_label = $has_end_date;
@@ -340,7 +340,7 @@ function date_views_field_views_data_alter(&$result, $field, $module) {
               break;
           }
         }
-      } 
+      }
     }
   }
 }
@@ -357,8 +357,8 @@ function date_views_form_views_ui_edit_form_alter(&$form, &$form_state) {
 }
 
 /**
- * The instanceof function makes this work for any handler that was derived 
- * from 'views_handler_filter_date' or 'views_handler_argument_date', 
+ * The instanceof function makes this work for any handler that was derived
+ * from 'views_handler_filter_date' or 'views_handler_argument_date',
  * which includes core date fields like the node updated field.
 */
 function date_views_handler_is_date($handler, $type = 'argument') {

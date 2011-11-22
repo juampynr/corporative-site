@@ -232,16 +232,19 @@ function _views_slideshow_preprocess_views_slideshow_pager_fields(&$vars) {
   // Add our class to the wrapper.
   $vars['classes_array'][] = 'views_slideshow_pager_field';
 
-  // Render all the fields.
+  // Render all the fields unless there is only 1 slide and the user specified
+  // to hide them when there is only one slide.
   $vars['rendered_field_items'] = '';
-  foreach ($vars['view']->result as $count => $node) {
-    $rendered_fields = '';
-    foreach ($vars['settings']['views_slideshow_pager_fields_fields'] as $field => $use) {
-      if ($use !== 0 && is_object($vars['view']->field[$field])) {
-        $rendered_fields .= theme('views_slideshow_pager_field_field', array('view' => $vars['view'], 'field' => $field, 'count' => $count));
+  if (empty($vars['settings']['hide_on_single_slide']) || count($vars['view']->result) > 1) {
+    foreach ($vars['view']->result as $count => $node) {
+      $rendered_fields = '';
+      foreach ($vars['settings']['views_slideshow_pager_fields_fields'] as $field => $use) {
+        if ($use !== 0 && is_object($vars['view']->field[$field])) {
+          $rendered_fields .= theme('views_slideshow_pager_field_field', array('view' => $vars['view'], 'field' => $field, 'count' => $count));
+        }
       }
+      $vars['rendered_field_items'] .= theme('views_slideshow_pager_field_item', array('vss_id' => $vars['vss_id'], 'item' => $rendered_fields, 'count' => $count, 'location' => $vars['location']));
     }
-    $vars['rendered_field_items'] .= theme('views_slideshow_pager_field_item', array('vss_id' => $vars['vss_id'], 'item' => $rendered_fields, 'count' => $count, 'location' => $vars['location']));
   }
 }
 
@@ -278,7 +281,7 @@ function theme_views_slideshow_controls_widget_render($vars) {
   drupal_add_js($js_vars, 'setting');
 
   $output = '';
-  if (count($vars['rows']) > 1) {
+  if (empty($vars['settings']['hide_on_single_slide']) && count($vars['rows']) > 1) {
     $output = theme($vars['settings']['type'], array('vss_id' => $vars['vss_id'], 'view' => $vars['view'], 'settings' => $vars['settings'], 'location' => $vars['location'], 'rows' => $vars['rows']));
   }
 

@@ -27,26 +27,27 @@
  * element, we'll compute the repeat sequence in the widget validation
  * to create the element delta values.
  */
-function _date_repeat_widget(&$element, $field, $instance, $items, $delta) {
+function _date_repeat_widget(&$element, $field, $instance, $item, $delta) {
   $element['rrule'] = array(
     '#type' => 'date_repeat_rrule',
     '#theme_wrappers' => array('date_repeat_rrule'),
-    '#default_value' => isset($items[0]['rrule']) ? $items[0]['rrule'] : '',
+    '#default_value' => isset($item['rrule']) ? $item['rrule'] : '',
     '#date_timezone' => $element['#date_timezone'],
     '#date_format'      => date_limit_format(date_input_format($element, $field, $instance), $field['settings']['granularity']),
     '#date_text_parts'  => (array) $instance['widget']['settings']['text_parts'],
     '#date_increment'   => $instance['widget']['settings']['increment'],
     '#date_year_range'  => $instance['widget']['settings']['year_range'],
     '#date_label_position' => $instance['widget']['settings']['label_position'],
-    '#prev_value' => isset($items[0]['value']) ? $items[0]['value'] : '',
-    '#prev_value2' => isset($items[0]['value2']) ? $items[0]['value2'] : '',
-    '#prev_rrule' => isset($items[0]['rrule']) ? $items[0]['rrule'] : '',
+    '#prev_value' => isset($item['value']) ? $item['value'] : '',
+    '#prev_value2' => isset($item['value2']) ? $item['value2'] : '',
+    '#prev_rrule' => isset($item['rrule']) ? $item['rrule'] : '',
     '#date_repeat_widget' => str_replace('_repeat', '', $instance['widget']['type']),
     '#date_repeat_collapsed' => $instance['widget']['settings']['repeat_collapsed'],
     '#date_flexible' => 0,
-    );
+  );
   return $element;
 }
+
 /**
  * Validation for date repeat form element.
  *
@@ -54,18 +55,34 @@ function _date_repeat_widget(&$element, $field, $instance, $items, $delta) {
  * Lots more work needed here.
  */
 function _date_repeat_widget_validate($element, &$form_state) {
+  $field_name = $element['#field_name'];
+  $delta = $element['#delta'];
+  $langcode = $element['#language'];
+
+  // If the widget has been hidden by #access, the RRULE will still be in its
+  // original string form here. Nothing to process.
+  if (date_hidden_element($element)) {
+
+    // If this was a hidden repeating date, we lost all the repeating values in the widget processing.
+    // Add them back here if that happened since we are skipping the re-creation of those values.
+    if (!empty($form_state['storage']['date_items'][$field_name])) {
+      array_pop($element['#parents']);
+      form_set_value($element, $form_state['storage']['date_items'][$field_name][$langcode], $form_state);
+    }
+    return;
+  }
+
   module_load_include('inc', 'date_repeat', 'date_repeat_form');
   $field_name = $element['#field_name'];
   $field = field_widget_field($element, $form_state);
   $instance = field_widget_instance($element, $form_state);
 
-  $form_values = $form_state['values'];
-  $item = $form_values;
-  $input = $form_state['input'];
-  foreach ($element['#parents'] as $key) {
-    $item = $item[$key];
-    $input = $input[$key];
-  }
+  // Here 'values' returns an array of input values, which includes the original RRULE, as a string.
+  // and 'input' returns an array of the form elements created by the repeating date widget, with
+  // RRULE values as an array of the selected elements and their chosen values.
+  $item = drupal_array_get_nested_value($form_state['values'], $element['#parents'], $input_exists);
+  $input = drupal_array_get_nested_value($form_state['input'], $element['#parents'], $input_exists);
+
   $rrule_values = date_repeat_merge($input['rrule'], $element['rrule']);
 
   // If no repeat information was set, treat this as a normal, non-repeating value.
@@ -110,7 +127,7 @@ function _date_repeat_widget_validate($element, &$form_state) {
       if (empty($item[$key])) {
         $item[$key] = '';
       }
-    }    
+    }
     $value = date_repeat_build_dates($rrule, $rrule_values, $field, $item);
     // Unset the delta value of the parents.
     array_pop($element['#parents']);
@@ -121,7 +138,7 @@ function _date_repeat_widget_validate($element, &$form_state) {
 
 /**
  * Helper function to build repeating dates from a $node_field.
- * 
+ *
  * Pass in either the RRULE or the $form_values array for the RRULE,
  * whichever is missing will be created when needed.
  */
@@ -136,7 +153,7 @@ function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $i
     $rrule_values = date_ical_parse_rrule(NULL, $rrule);
   }
 
-  // By the time we get here, the start and end dates have been 
+  // By the time we get here, the start and end dates have been
   // adjusted back to UTC, but we want localtime dates to do
   // things like '+1 Tuesday', so adjust back to localtime.
   $timezone = date_get_timezone($field['settings']['tz_handling'], $item['timezone']);
@@ -185,8 +202,8 @@ function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $i
     // not necessarily $field['type'] dates.
     // Convert returned dates back to db timezone before storing.
     $date_start = new DateObject($date, $timezone, DATE_FORMAT_DATETIME);
-    $date_start->limitGranularity($field['settings']['granularity']);  
-    date_timezone_set($date_start, timezone_open($timezone_db));    
+    $date_start->limitGranularity($field['settings']['granularity']);
+    date_timezone_set($date_start, timezone_open($timezone_db));
     $date_end = clone($date_start);
     date_modify($date_end, '+' . $duration . ' seconds');
     $value[$delta] = array(
@@ -198,5 +215,5 @@ function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $i
       'rrule' => $rrule,
       );
   }
-  return $value;  
+  return $value;
 }

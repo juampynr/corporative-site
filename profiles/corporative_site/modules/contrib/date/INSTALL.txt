@@ -7,12 +7,12 @@ Date API Installation instructions:
 
 2) Download the whole package of files from http://drupal.org/project/date.
 
-3) Upload the date files to the modules directory. The package includes files 
+3) Upload the date files to the modules directory. The package includes files
    needed by the Date API, and optional modules to to create date fields.
 
-4) Go to admin/modules and enable the needed modules from the Date/Time group. 
+4) Go to admin/modules and enable the needed modules from the Date/Time group.
 
-You should end up with a structure like: 
+You should end up with a structure like:
 
    /drupal/sites/all/modules/date/date.info
    /drupal/sites/all/modules/date/date.install
@@ -42,4 +42,4 @@ Install Date Fields:
 
 ==================================================================================
 More documentation is available at http://drupal.org/node/92460.
-==================================================================================   
+==================================================================================

@@ -2,7 +2,7 @@
 /**
  * @TODO
  *
- * Currently only implemented for nodes. Need to add $plugin->execute() 
+ * Currently only implemented for nodes. Need to add $plugin->execute()
  * for any other entities that might be supported.
  *
  * Cache the date processing, perhaps cache the formatted, timezone-adjusted
@@ -25,7 +25,7 @@ function date_context_context_node_condition_alter($node, $op) {
  * Implementation of hook_context_plugins()
  */
 function date_context_context_plugins() {
-  $plugins = array();      
+  $plugins = array();
   $plugins['date_context_date_condition'] = array(
     'handler' => array(
     'class' => 'date_context_date_condition',
@@ -34,11 +34,11 @@ function date_context_context_plugins() {
   );
   return $plugins;
 }
- 
-/**  
+
+/**
  * Implementation of hook_context_registry()
- */ 
- 
+ */
+
 function date_context_context_registry() {
   return array(
     'conditions' => array(
@@ -103,16 +103,14 @@ class date_context_date_condition extends context_condition_node {
         $fields = $this->fetch_from_context($context, 'values');
 
         foreach ($fields as $field_name => $label) {
-         
+
           // If this field does not exist on this entity, just move along.
           if (empty($entity->{$field_name})) {
             continue;
           }
 
-          $items = $entity->{$field_name};
-          $language = $entity->language;
-          $items = $items[$language];
-     
+          $items = field_get_items('node', $entity, $field_name);
+
           // If there are no values, nothing to do unless we were looking for 'empty' or '!='.
           if (empty($items)) {
             if ($options['operation'] == '!=' || $options['operation'] == 'empty') {

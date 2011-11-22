@@ -2,7 +2,7 @@
 /**
  * @file
  * Date API views argument handler.
- * This argument combines multiple date arguments into a single argument 
+ * This argument combines multiple date arguments into a single argument
  * where all fields are controlled by the same date and can be combined with either AND or OR.
  */
 
@@ -114,7 +114,7 @@ class date_views_argument_handler extends date_views_argument_handler_simple {
    */
   function default_actions($which = NULL) {
     $defaults = parent::default_actions();
-  
+
     // There is no easy way to do summary queries on multiple fields, so remove that option.
     unset($defaults['summary']);
 
@@ -134,7 +134,7 @@ class date_views_argument_handler extends date_views_argument_handler_simple {
    * The argument sent may be found at $this->argument.
    */
   function query($group_by = FALSE) {
-   
+
     // @TODO Not doing anything with $group_by yet, need to figure out what has to be done.
 
     if ($this->date_forbid()) {
@@ -145,7 +145,7 @@ class date_views_argument_handler extends date_views_argument_handler_simple {
     $this->granularity = $this->date_handler->arg_granularity($this->argument);
     $format = $this->date_handler->views_formats($this->granularity, 'sql');
     if (!empty($this->query_fields)) {
-      // Use set_where_group() with the selected date_method 
+      // Use set_where_group() with the selected date_method
       // of 'AND' or 'OR' to create the where clause.
       foreach ($this->query_fields as $count => $query_field) {
         $field = $query_field['field'];

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Date pager. 
+ * Date pager.
  * Works with a Date argument, the argument filters the view and the pager provides back/next navigation.
  *
  * USER NOTES:
@@ -10,7 +10,7 @@
  * There are several settings:
  * - The pager id: Set an id to be used as the identifier in the url for pager values, defaults to 'date'.
  * - Pager position: Choose whether to display the date pager above, below, or both above and below the content.
- * - Link format: Choose whether the pager links will be in the simple 'calendar/2011-12' format or the 
+ * - Link format: Choose whether the pager links will be in the simple 'calendar/2011-12' format or the
  *   more complex 'calendar/?date=2011-12' pager format. The second one is more likely to work correctly
  *   if the pager is used in blocks and panels.
  *
@@ -22,10 +22,10 @@
  *
  * DEVELOPER NOTES
  *
- * The pager could technically create a query of its own rather than depending on the date argument to 
- * set the query, but it has only a limited set of tools to work with because it is a plugin, not a handler: 
- * it has no knowledge about relationships, it cannot use the ensure_my_table() function, 
- * plugins are not even invoked in pre_query(), so can't do anything there. 
+ * The pager could technically create a query of its own rather than depending on the date argument to
+ * set the query, but it has only a limited set of tools to work with because it is a plugin, not a handler:
+ * it has no knowledge about relationships, it cannot use the ensure_my_table() function,
+ * plugins are not even invoked in pre_query(), so can't do anything there.
  *
  * My conclusion was that the date pager simply is not powerful enough to create its own queries for
  * date fields, which require very complex queries. Instead, we can combine this with a date argument and
@@ -121,7 +121,7 @@ class date_views_plugin_pager extends views_plugin_pager {
    * and update the date argument value to whatever is set by the pager.
    */
   function query() {
-    
+
     // By fetching our data from the exposed input, it is possible to
     // feed pager data through some method other than $_GET.
     $input = $this->view->get_exposed_input();
@@ -131,7 +131,7 @@ class date_views_plugin_pager extends views_plugin_pager {
     }
 
     // Bring the argument information into the view so our theme can access it.
-    $i = 0;    
+    $i = 0;
     foreach ($this->view->argument as $id => $argument) {
       if (date_views_handler_is_date($argument, 'argument')) {
 
@@ -140,7 +140,7 @@ class date_views_plugin_pager extends views_plugin_pager {
         if (empty($argument->argument) || empty($argument->date_handler)) {
           continue;
         }
-        
+
         // Storing this information in the pager so it's available for summary info.
         // The view argument information is not otherwise accessible to the pager.
         // Not working right yet, tho.
@@ -178,7 +178,7 @@ class date_views_plugin_pager extends views_plugin_pager {
     }
 
     // Is this a view that needs to be altered based on a pager value?
-    // If there is pager input and the argument has set the placeholders, 
+    // If there is pager input and the argument has set the placeholders,
     // swap the pager value in for the placeholder set by the argument.
     if (!empty($value) && !empty($this->view->date_info->placeholders)) {
       $placeholders = $this->view->date_info->placeholders;
@@ -194,7 +194,7 @@ class date_views_plugin_pager extends views_plugin_pager {
                 $next_placeholder = array_shift($placeholders);
                 //dsm('resetting '. $placeholder . ' from ' . $next_placeholder . ' to '. $date->format($format));
                 $this->view->query->where[$group]['conditions'][$delta]['value'][$placeholder] = $date->format($format);
-                $count--;              
+                $count--;
               }
             }
           }

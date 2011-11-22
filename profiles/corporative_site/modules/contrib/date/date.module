@@ -146,7 +146,11 @@ function date_is_repeat_field($field, $instance = NULL) {
   if (is_string($field)) {
     $field = field_info_field($field);
   }
-  
+
+  if (!isset($field['settings']['repeat'])) {
+    return FALSE;
+  }
+
   $value = $field['settings']['repeat'];
 
   // This might be either a field form or a real field.
@@ -299,7 +303,6 @@ function date_element_info() {
     '#columns' => array('value', 'value2', 'timezone', 'offset', 'offset2'),
     '#process' => array('date_combo_element_process'),
     '#element_validate' => array('date_combo_validate'),
-    '#value_callback' => 'date_combo_value_callback',
     '#theme_wrappers' => array('date_combo'),
   );
   if (module_exists('ctools')) {
@@ -333,7 +336,7 @@ function date_element_info() {
  */
 function date_formatter_process($formatter, $entity_type, $entity, $field, $instance, $langcode, $item, $display) {
   $dates = array();
-  $timezone = date_default_timezone();    
+  $timezone = date_default_timezone();
   if (empty($timezone)) {
     return $dates;
   }
@@ -468,7 +471,7 @@ function date_help($path, $arg) {
 function date_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
   $field = $form['#field'];
   $instance = $form['#instance'];
- 
+
   if (!in_array($field['type'], array('date', 'datetime', 'datestamp'))) {
     return;
   }
@@ -542,12 +545,15 @@ function date_field_widget_error($element, $error, $form, &$form_state) {
 /**
  * Retrieve a date format string from formatter settings.
  */
-function date_formatter_format($formatter, $settings, $granularity = NULL, $langcode = NULL) {
+function date_formatter_format($formatter, $settings, $granularity = array(), $langcode = NULL) {
   $format_type = !empty($settings['format_type']) ? $settings['format_type'] : 'format_interval';
 
   switch ($formatter) {
     case 'format_interval':
       return 'format_interval';
+      break;
+    case 'date_plain':
+      return 'date_plain';
       break;
     default:
       $format = system_date_format_locale($langcode, $format_type);
@@ -584,8 +590,8 @@ function date_formatter_format($formatter, $settings, $granularity = NULL, $lang
             break;
         }
         $format = variable_get('date_format_'. $format_type, $default);
-      }      
-      break; 
+      }
+      break;
   }
 
   // A selected format might include timezone information.
@@ -643,7 +649,7 @@ function date_prepare_entity($formatter, $entity_type, $entity, $field, $instanc
         }
         else {
           $count++;
-        }  
+        }
       }
     }
   }

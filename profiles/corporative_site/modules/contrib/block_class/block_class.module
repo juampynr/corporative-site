@@ -24,16 +24,13 @@ function block_class($block) {
  */
 function block_class_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'block_admin_configure' || $form_id == 'block_add_block_form') {
+    $block = new stdClass;
     $block->module = $form['module']['#value'];
     $block->delta = $form['delta']['#value'];
     $css_class = block_class($block);
 
     // Create a more technical description for users with administer blocks permission.
-    $description = t('Customize the styling of this block by adding CSS classes. You can add multiple classes.');
-    if (user_access('administer blocks')) {
-      $description .= ' ';
-      $description .= t('IMPORTANT: You must add <code>&lt;?php print $block_classes; ?&gt;</code> to your theme\'s block.tpl.php file to make the classes appear. See the module\'s README.txt for more details.');
-    }
+    $description = t('Customize the styling of this block by adding CSS classes. Separate multiple classes by spaces.');
 
     $form['block_class'] = array(
       '#type' => 'fieldset',

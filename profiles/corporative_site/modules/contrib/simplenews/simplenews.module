@@ -82,33 +82,26 @@ define('SIMPLENEWS_OPT_INOUT_DOUBLE', 'double');
 /**
  * Implementation of hook_permission().
  *
- * @todo Change array format and add titles where required: http://drupal.org/node/224333#descriptions_permissions
  * @todo Change sort order where required: http://drupal.org/node/224333#sorting_permissions
  * @todo Review the use of 'administer nodes': http://drupal.org/node/224333#bypass_node_access
- * @todo hook_perm() renamed: http://drupal.org/node/224333#hook_permission
  */
 function simplenews_permission() {
   return array(
     // @todo Change to administer newsletter categories. And update existing permissions in hook_update_N.
     'administer newsletters' => array(
-      'title' => t('administer newsletters'),
-      'description' => t('@todo Add a description for administer newsletters'),
+      'title' => t('Administer newsletters'),
     ),
     'administer simplenews subscriptions' => array(
-      'title' => t('administer simplenews subscriptions'),
-      'description' => t('@todo Add a description for administer simplenews subscriptions'),
+      'title' => t('Administer simplenews subscriptions'),
     ),
     'administer simplenews settings' => array(
-      'title' => t('administer simplenews settings'),
-      'description' => t('@todo Add a description for administer simplenews settings'),
+      'title' => t('Administer simplenews settings'),
     ),
     'send newsletter' => array(
-      'title' => t('send newsletter'),
-      'description' => t('@todo Add a description for send newsletter'),
+      'title' => t('Send newsletter'),
     ),
     'subscribe to newsletters' => array(
-      'title' => t('subscribe to newsletters'),
-      'description' => t('@todo Add a description for subscribe/unsubscribe to newsletters'),
+      'title' => t('Subscribe to newsletters'),
     ),
   );
 }
@@ -341,14 +334,14 @@ function simplenews_newsletter_access() {
  * Implementation of hook_node_type_delete().
  */
 function simplenews_node_type_delete($info) {
-  simplenews_get_content_types(TRUE);
+  drupal_static_reset('simplenews_get_content_types');
 }
 
 /**
  * Implementation of hook_node_type_update().
  */
 function simplenews_node_type_update($info) {
-  simplenews_get_content_types(TRUE);
+  simplenews_get_content_types('simplenews_get_content_types');
 }
 
 /**
@@ -571,16 +564,13 @@ function simplenews_check_node_types($types) {
 /**
  * Get all node types supported by Simplenews.
  *
- * @param $reset
- *   TRUE: reset internal cache.
- *
  * @return
  *   Array of node-types which can be used a simplenews newsletter.
  */
-function simplenews_get_content_types($reset = FALSE) {
+function simplenews_get_content_types() {
   $simplenews_types = &drupal_static(__FUNCTION__, array());
 
-  if (!$simplenews_types || $reset) {
+  if (!$simplenews_types) {
     foreach (node_type_get_types() as $name => $type) {
       if (variable_get('simplenews_content_type_' . $name, FALSE)) {
         $simplenews_types[] = $name;
@@ -762,17 +752,20 @@ function simplenews_form_alter(&$form, &$form_state, $form_id) {
  * @todo
  */
 function _simplenews_node_form(&$form, $form_state) {
-  $form['simplenews_token_help'] = array(
-    '#title' => t('Replacement patterns'),
-    '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#description' => t('These tokens can be used in all text fields and will be replaced on-screen and in the email. Note that receiver-* tokens are not suitable for on-screen use.'),
-  );
+  if (module_exists('token')) {
+    $form['simplenews_token_help'] = array(
+      '#title' => t('Replacement patterns'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#description' => t('These tokens can be used in all text fields and will be replaced on-screen and in the email. Note that receiver-* tokens are not suitable for on-screen use.'),
+    );
 
-  $form['simplenews_token_help']['help'] = array(
-    '#markup' => _simplenews_get_token_info(array('simplenews-newsletter', 'simplenews-category', 'site')),
-  );
+    $form['simplenews_token_help']['browser'] = array(
+      '#theme' => 'token_tree',
+      '#token_types' => array('simplenews-newsletter', 'simplenews-category'),
+    );
+  }
 }
 
 /**
@@ -1425,12 +1418,8 @@ function simplenews_unsubscribe_user($mail, $tid, $confirm = TRUE, $source = 'un
  * @todo Only return active subscriptions.
  * @todo Caching should be done in simplenews_get_subscription().
  */
-function simplenews_user_is_subscribed($mail, $tid, $reset = FALSE) {
+function simplenews_user_is_subscribed($mail, $tid) {
   $subscribed = &drupal_static(__FUNCTION__, array());
-
-  if ($reset) {
-    $subscribed = array();
-  }
 
   if (!isset($subscribed[$mail][$tid])) {
     $subscription = simplenews_get_subscription((object)array('mail' => $mail));
@@ -1513,7 +1502,7 @@ function simplenews_get_subscription($account) {
     $query->condition('s.snid', $account->snid);
   }
   elseif (isset($account->mail)) {
-    $query->where('LOWER(s.mail) = LOWER(:mail)', array(':mail' => $account->mail));
+    $query->condition('s.mail', $account->mail, 'LIKE');
   }
   elseif (isset($account->uid) && $account->uid > 0) {
     $query->condition('s.uid', $account->uid);
@@ -1810,7 +1799,6 @@ function simplenews_recent_newsletters($tid, $count = 5) {
  *
  * @see simplenews_block_form_validate()
  * @see simplenews_block_form_submit()
- * @todo Add $form to drupal_get_form() callback functions.
  * @see http://drupal.org/node/224333#hook_forms_signature
  */
 function simplenews_block_form($form, &$form_state, $tid) {
@@ -2464,54 +2452,20 @@ function simplenews_newsletter_delete($newsletter) {
 }
 
 /**
- * Return HTML formatted list of token info.
- *
- * @param $modules
- *   Array of module names
- * @return string
- *   Formatted Token information
- *
- * @todo Add Token types description.
- * @todo Use Theme function.
- * @todo Is this available in Core?
- */
-function _simplenews_get_token_info($modules) {
-  $tokens = array();
-  $token_info = token_info();
-  foreach ($modules as $module) {
-    if (isset($token_info['tokens'][$module])) {
-      foreach ($token_info['tokens'][$module] as $key => $info) {
-        $tokens["[$module:$key]"] = $info['description'];
-      }
-    }
-  }
-
-  $output = '<dl>';
-  foreach ($tokens as $name => $description) {
-    $output .= '<dt>' . $name . '</dt>';
-    $output .= '<dd>' . $description . '</dd>';
-  }
-  $output .= "</dl>\n";
-  return $output;
-}
-
-/**
  * Implementation of hook_token_info().
  */
 function simplenews_token_info() {
+  // @todo Add desription to the types and extend available tokens.
   $types['simplenews-subscriber'] = array(
     'name' => t('Simplenews subscriber'),
-    'description' => t('@todo .'),
     'needs-data' => 'account',
   );
   $types['simplenews-newsletter'] = array(
     'name' => t('Simplenews newsletter'),
-    'description' => t('@todo .'),
     'needs-data' => 'node',
   );
   $types['simplenews-category'] = array(
     'name' => t('Simplenews newsletter category'),
-    'description' => t('@todo .'),
     'needs-data' => 'category',
   );
 

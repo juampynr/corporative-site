@@ -9,8 +9,8 @@
  *
  *  @return
  *    array with fieldname, type, and table.
- *  @see 
- *    date_views_date_views_fields() which implements 
+ *  @see
+ *    date_views_date_views_fields() which implements
  *    the hook_date_views_fields() for the core date fields.
  */
 function _date_views_fields($base = 'node') {
@@ -26,7 +26,7 @@ function _date_views_fields($base = 'node') {
   // We use fields that provide filter handlers as our universe of possible
   // fields of interest.
   $all_fields = date_views_views_fetch_fields($base, 'filter');
-  
+
   // Iterate over all the fields that Views knows about.
   $fields = array();
   foreach ((array) $all_fields as $alias => $val) {
@@ -51,7 +51,7 @@ function _date_views_fields($base = 'node') {
 
     // If we don't have a filter handler, we don't need to do anything more.
     if (!$handler = views_get_handler($table_name, $field_name, 'filter')) {
-      continue; 
+      continue;
     }
     $handler = views_get_handler($table_name, $field_name, 'filter');
     $handler_name = $handler->definition['handler'];
@@ -78,10 +78,10 @@ function _date_views_fields($base = 'node') {
           break;
         default:
           // If this is not a date field, nothing more to do.
-          continue;          
-      }      
-      
-      $db_info = date_api_database_info($field);      
+          continue;
+      }
+
+      $db_info = date_api_database_info($field);
       $name = $table_name . "." . $field_name;
       $granularity = !empty($field['granularity']) ? $field['granularity'] : array('year', 'month', 'day', 'hour', 'minute');
 
@@ -115,7 +115,7 @@ function _date_views_fields($base = 'node') {
       if ($field['cardinality'] != 1) {
         array_push($related_fields, "$table_name.delta");
         $delta_field = $table_name . '_delta';
-      }      
+      }
     }
 
     // Allow custom modules to provide date fields.

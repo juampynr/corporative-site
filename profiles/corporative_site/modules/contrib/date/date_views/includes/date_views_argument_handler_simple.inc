@@ -52,9 +52,9 @@ class date_views_argument_handler_simple extends views_handler_argument_date {
       $granularity = $this->options['granularity'];
       if ($granularity == 'week') {
         $now = date_now();
-        $week = date_week($now);
+        $week = date_week(date_format($now, 'Y-m-d'));
         return date_format($now, 'Y') .'-W'. $week;
-      } 
+      }
       else {
         return date($this->arg_format, REQUEST_TIME);
       }
@@ -71,8 +71,8 @@ class date_views_argument_handler_simple extends views_handler_argument_date {
     $options['year_range'] = array('default' => '-3:+3');
     $options['granularity'] = array('default' => 'month');
     $options['default_argument_type'] = array('default' => 'date');
-    $options['add_delta'] = array('default' => '');  
-    $options['use_fromto'] = array('default' => '');  
+    $options['add_delta'] = array('default' => '');
+    $options['use_fromto'] = array('default' => '');
     return $options;
   }
 
@@ -164,9 +164,6 @@ class date_views_argument_handler_simple extends views_handler_argument_date {
    * Inject a test for valid date range before the summary query.
    */
   function summary_query() {
-    if ($this->date_forbid()) {
-      return;
-    }
     $this->formula = $this->formula($this->real_field);
     $this->ensure_my_table();
     // Now that our table is secure, get our formula.
@@ -246,7 +243,7 @@ class date_views_argument_handler_simple extends views_handler_argument_date {
       $fields = date_views_fields($this->view->base_table);
       $fields = $fields['name'];
       $fromto = $fields[$this->original_table . '.' . $this->real_field]['fromto'];
-      
+
       $value_min = str_replace($this->original_table, $this->table_alias, $fromto[0]);
       $value_max = str_replace($this->original_table, $this->table_alias, $fromto[1]);
       $field_min = $this->date_handler->sql_field($value_min, $this->offset);
@@ -267,7 +264,7 @@ class date_views_argument_handler_simple extends views_handler_argument_date {
     $this->date_range = $this->date_handler->arg_range($this->argument);
     $this->min_date = $this->date_range[0];
     $this->max_date = $this->date_range[1];
-    $this->limit = date_range_years($this->options['year_range']); 
+    $this->limit = date_range_years($this->options['year_range']);
     $group = !empty($this->options['date_group']) ? $this->options['date_group'] : 0;
 
     // See if we're outside the allowed date range for our argument.

@@ -16,9 +16,9 @@ files[] = includes/views/handlers/simplenews_handler_filter_category_hyperlinks.
 files[] = includes/views/handlers/simplenews_handler_filter_category_new_account.inc
 files[] = includes/views/handlers/simplenews_handler_filter_category_opt_inout.inc
 
-; Information added by drupal.org packaging script on 2011-10-08
+; Information added by drupal.org packaging script on 2011-10-17
 version = "7.x-1.x-dev"
 core = "7.x"
 project = "simplenews"
-datestamp = "1318076711"
+datestamp = "1318853872"
 
